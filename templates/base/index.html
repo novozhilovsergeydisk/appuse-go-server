@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>title</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"> <!-- <span class="material-icons">home</span> -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#1E40AF',
+                        success: '#10B981',
+                        danger: '#EF4444'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-900 text-white min-h-screen p-4 md:p-8">
+    <!-- Навигационное меню -->
+    <nav class="bg-gray-800 rounded-lg shadow-lg mb-8">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <span class="text-xl font-bold text-white">PostgreSQL <i class="fas fa-cog"></i> Тесты на DBA-1</span>
+                </div>
+                
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="#" class="px-3 py-2 rounded-md text-sm font-medium text-white hover:bg-primary hover:text-white transition duration-150">
+                            Главная
+                        </a>
+                        
+                        <div class="relative group">
+                            <a href="#" class="px-3 py-2 rounded-md text-sm font-medium text-white hover:bg-primary hover:text-white transition duration-150 flex items-center">
+                                Тесты DBA-1
+                                <svg class="ml-1 h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                                </svg>
+                            </a>
+                            
+                            <div class="absolute left-0 mt-2 w-56 rounded-md shadow-lg bg-gray-700 ring-1 ring-black ring-opacity-5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-right scale-95 group-hover:scale-100">
+                                <div class="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
+                                    <a href="#" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-600 hover:text-white" role="menuitem">
+                                        Установка и управление сервером
+                                    </a>
+                                    <a href="#" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-600 hover:text-white" role="menuitem">
+                                        Использование psql
+                                    </a>
+                                    <a href="#" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-600 hover:text-white" role="menuitem">
+                                        Конфигурирование сервера
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-3xl mx-auto">
+        <h1 class="text-3xl font-bold mb-6 text-center">yyy</h1>
+        
+        <div id="quiz-container" class="space-y-8"></div>
+
+        <button onclick="checkAnswers()" class="mt-8 w-full py-3 bg-primary hover:bg-secondary text-white font-bold rounded-lg transition duration-300">
+            Проверить результат
+        </button>
+
+        <div id="result" class="hidden mt-8 p-6 bg-gray-800 rounded-lg text-center">
+            <h2 class="text-2xl font-bold mb-4">Ваш результат:</h2>
+            <p id="percentage" class="text-4xl text-primary font-mono"></p>
+        </div>
+    </div>
+
+    <script>
+        const quizData = [
+  
+        ];
+
+        function createQuiz() {
+            const container = document.getElementById('quiz-container');
+            
+            quizData.forEach((item, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = "bg-gray-800 p-6 rounded-lg";
+                
+                questionDiv.innerHTML = `
+                    <h2 class="text-xl font-semibold mb-4">${index + 1}. ${item.question}</h2>
+                    <div class="space-y-2">
+                        ${item.options.map((option, i) => `
+                            <label class="flex items-center space-x-3 p-2 rounded-md hover:bg-gray-700 answer-label">
+                                <input type="radio" name="q${index}" value="${i}" class="w-4 h-4 text-primary focus:ring-primary">
+                                <span>${option}</span>
+                            </label>
+                        `).join('')}
+                    </div>
+                `;
+                
+                container.appendChild(questionDiv);
+            });
+        }
+
+        function checkAnswers() {
+            let correct = 0;
+            let hasUnanswered = false;
+            const resultDiv = document.getElementById('result');
+            const percentage = document.getElementById('percentage');
+            
+            // Очистка предыдущих подсветок
+            document.querySelectorAll('.answer-label').forEach(label => {
+                label.classList.remove('bg-green-900/20', 'bg-red-900/20', 'border', 'border-success', 'border-danger');
+            });
+
+            // Проверка на все ответы
+            for (let i = 0; i < quizData.length; i++) {
+                if (!document.querySelector(`input[name="q${i}"]:checked`)) {
+                    hasUnanswered = true;
+                    document.querySelectorAll(`input[name="q${i}]`).forEach(input => {
+                        input.closest('.answer-label').classList.add('border', 'border-danger');
+                    });
+                }
+            }
+
+            if (hasUnanswered) {
+                alert('Пожалуйста, ответьте на все вопросы!');
+                return;
+            }
+
+            // Проверка ответов и подсветка только выбранных пользователем
+            quizData.forEach((item, index) => {
+                const selected = document.querySelector(`input[name="q${index}"]:checked`);
+                if (selected) {
+                    const selectedLabel = selected.closest('.answer-label');
+                    const correctLabel = document.querySelector(`input[name="q${index}"][value="${item.answer}"]`).closest('.answer-label');
+                    
+                    if (parseInt(selected.value) === item.answer) {
+                        correctLabel.classList.add('bg-green-900/20', 'border', 'border-success');
+                        correct++;
+                    } else {
+                        selectedLabel.classList.add('bg-red-900/20', 'border', 'border-danger');
+                        correctLabel.classList.add('bg-green-900/20', 'border', 'border-success');
+                    }
+                }
+            });
+            
+            const percent = (correct / quizData.length) * 100;
+            percentage.textContent = `${percent.toFixed(1)}%`;
+            
+            resultDiv.classList.remove('hidden');
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        }
+
+        // Инициализация квиза при загрузке страницы
+        window.onload = createQuiz;
+    </script>
+</body>
+</html>

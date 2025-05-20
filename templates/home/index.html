@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PostgreSQL Тесты DBA-1 | Главная</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons " rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css ">
+    <script src="https://cdn.tailwindcss.com "></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#1E40AF',
+                        success: '#10B981',
+                        danger: '#EF4444'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-900 text-white min-h-screen p-4 md:p-8">
+    {{template "navbar.html" .}}
+    
+    <!-- Hero Section -->
+    <div class="max-w-4xl mx-auto text-center mb-16">
+        <h1 class="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+            PostgreSQL DBA-1 Тестирование
+        </h1>
+        <p class="text-xl text-gray-300 mb-8">
+            Проверьте свои знания по администрированию PostgreSQL через интерактивные квизы<br>
+            <span class="text-sm">Тесты составлены для версии PostgreSQL 16</span>
+        </p>
+        <div class="flex flex-wrap justify-center gap-4">
+            <a href="/using_psql" class="px-6 py-3 bg-primary hover:bg-secondary rounded-lg transition duration-300 flex items-center">
+                <span class="mr-2">🚀</span> Использование psql
+            </a>
+            <a href="/server_installation" class="px-6 py-3 bg-success hover:bg-green-700 rounded-lg transition duration-300 flex items-center">
+                <span class="mr-2">⚙️</span> Установка сервера
+            </a>
+            <a href="/server_configuration" class="px-6 py-3 bg-secondary hover:bg-primary rounded-lg transition duration-300 flex items-center">
+                <span class="mr-2">🛠️</span> Конфигурирование
+            </a>
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <div class="max-w-6xl mx-auto grid md:grid-cols-3 gap-8 mb-16">
+        <div class="bg-gray-800 p-6 rounded-lg border border-gray-700">
+            <div class="w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center mb-4">
+                <i class="fas fa-server text-primary text-xl"></i>
+            </div>
+            <h3 class="text-xl font-semibold mb-2">Практические навыки</h3>
+            <p class="text-gray-400">Тесты разработаны с акцентом на практическое применение знаний при работе с PostgreSQL</p>
+        </div>
+        
+        <div class="bg-gray-800 p-6 rounded-lg border border-gray-700">
+            <div class="w-12 h-12 bg-success/20 rounded-full flex items-center justify-center mb-4">
+                <i class="fas fa-chart-line text-success text-xl"></i>
+            </div>
+            <h3 class="text-xl font-semibold mb-2">Объективная оценка</h3>
+            <p class="text-gray-400">Получите точный процент правильных ответов с детальным анализом результатов</p>
+        </div>
+        
+        <div class="bg-gray-800 p-6 rounded-lg border border-gray-700">
+            <div class="w-12 h-12 bg-secondary/20 rounded-full flex items-center justify-center mb-4">
+                <i class="fas fa-book text-secondary text-xl"></i>
+            </div>
+            <h3 class="text-xl font-semibold mb-2">Постоянное развитие</h3>
+            <p class="text-gray-400">Регулярно обновляемые тесты для углубленного изучения PostgreSQL</p>
+        </div>
+    </div>
+
+    <!-- Quiz Categories -->
+    <div class="max-w-6xl mx-auto mb-16">
+        <h2 class="text-2xl font-bold mb-6 text-center">Темы тестов DBA-1</h2>
+        <div class="grid md:grid-cols-2 gap-6">
+            <div class="bg-gray-800 rounded-lg overflow-hidden group hover:border-l-4 hover:border-primary transition-all">
+                <div class="bg-gray-700 p-4 flex justify-between items-center">
+                    <h3 class="font-bold">Использование psql</h3>
+                    <i class="fas fa-terminal text-primary group-hover:animate-pulse"></i>
+                </div>
+                <div class="p-4">
+                    <p class="text-gray-300 mb-4">Практические вопросы по работе с консольным клиентом PostgreSQL</p>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li class="flex items-center"><i class="fas fa-check-circle text-success mr-2"></i> Команды psql</li>
+                        <li class="flex items-center"><i class="fas fa-check-circle text-success mr-2"></i> Форматирование вывода</li>
+                        <li class="flex items-center"><i class="fas fa-check-circle text-success mr-2"></i> Работа с переменными</li>
+                        <li class="flex items-center"><i class="fas fa-check-circle text-success mr-2"></i> Скрипты и автоматизация</li>
+                    </ul>
+                    <a href="/using_psql" class="mt-4 block text-center text-primary hover:text-secondary transition-colors">
+                        Пройти тест →
+                    </a>
+                </div>
+            </div>
+
+            <div class="bg-gray-800 rounded-lg overflow-hidden group hover:border-l-4 hover:border-success transition-all">
+                <div class="bg-gray-700 p-4 flex justify-between items-center">
+                    <h3 class="font-bold">Конфигурирование сервера</h3>
+                    <i class="fas fa-cog text-success group-hover:animate-spin"></i>
+                </div>
+                <div class="p-4">
+                    <p class="text-gray-300 mb-4">Тесты по настройке и оптимизации сервера PostgreSQL</p>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li class="flex items-center"><i class="fas fa-check-circle text-success mr-2"></i> Файлы конфигурации</li>
+                        <li class="flex items-center"><i class="fas fa-check-circle text-success mr-2"></i> Параметры сервера</li>
+                        <li class="flex items-center"><i class="fas fa-check-circle text-success mr-2"></i> Оптимизация производительности</li>
+                        <li class="flex items-center"><i class="fas fa-check-circle text-success mr-2"></i> Мониторинг и логирование</li>
+                    </ul>
+                    <a href="/server_configuration" class="mt-4 block text-center text-success hover:text-green-500 transition-colors">
+                        Пройти тест →
+                    </a>
+                </div>
+            </div>
+
+            <div class="bg-gray-800 rounded-lg overflow-hidden group hover:border-l-4 hover:border-secondary transition-all">
+                <div class="bg-gray-700 p-4 flex justify-between items-center">
+                    <h3 class="font-bold">Установка и управление</h3>
+                    <i class="fas fa-database text-secondary group-hover:text-blue-400 transition-colors"></i>
+                </div>
+                <div class="p-4">
+                    <p class="text-gray-300 mb-4">Тесты по установке, настройке и повседневному управлению PostgreSQL</p>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li class="flex items-center"><i class="fas fa-check-circle text-success mr-2"></i> Установка PostgreSQL</li>
+                        <li class="flex items-center"><i class="fas fa-check-circle text-success mr-2"></i> Управление сервисами</li>
+                        <li class="flex items-center"><i class="fas fa-check-circle text-success mr-2"></i> Резервное копирование</li>
+                        <li class="flex items-center"><i class="fas fa-check-circle text-success mr-2"></i> Безопасность и права</li>
+                    </ul>
+                    <a href="/server_installation" class="mt-4 block text-center text-secondary hover:text-primary transition-colors">
+                        Пройти тест →
+                    </a>
+                </div>
+            </div>
+
+            <div class="bg-gray-800 rounded-lg overflow-hidden group hover:border-l-4 hover:border-success transition-all">
+                <div class="bg-gray-700 p-4 flex justify-between items-center">
+                    <h3 class="font-bold">Продвинутый уровень</h3>
+                    <i class="fas fa-award text-yellow-500"></i>
+                </div>
+                <div class="p-4">
+                    <p class="text-gray-300 mb-4">Подготовьтесь к сертификации и профессиональной работе с БД</p>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li class="flex items-center"><i class="fas fa-check-circle text-success mr-2"></i> Производственные сценарии</li>
+                        <li class="flex items-center"><i class="fas fa-check-circle text-success mr-2"></i> Оптимизация запросов</li>
+                        <li class="flex items-center"><i class="fas fa-check-circle text-success mr-2"></i> Репликация и кластеризация</li>
+                        <li class="flex items-center"><i class="fas fa-check-circle text-success mr-2"></i> Восстановление после сбоев</li>
+                    </ul>
+                    <a href="#" class="mt-4 block text-center text-success hover:text-green-500 transition-colors">
+                        Скоро →
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Benefits Section -->
+    <div class="max-w-5xl mx-auto mb-16">
+        <h2 class="text-2xl font-bold mb-6 text-center">Почему стоит пройти наши тесты?</h2>
+        <div class="grid md:grid-cols-2 gap-8">
+            <div class="flex items-start">
+                <i class="fas fa-play-circle text-primary text-3xl mr-4 mt-1"></i>
+                <div>
+                    <h3 class="text-xl font-semibold mb-2">Практическая польза</h3>
+                    <p class="text-gray-400">Тесты составлены на основе реальных сценариев работы администраторов БД</p>
+                </div>
+            </div>
+            
+            <div class="flex items-start">
+                <i class="fas fa-chart-line text-success text-3xl mr-4 mt-1"></i>
+                <div>
+                    <h3 class="text-xl font-semibold mb-2">Прогресс в обучении</h3>
+                    <p class="text-gray-400">Отслеживайте свои результаты и улучшайте уровень знаний</p>
+                </div>
+            </div>
+            
+            <div class="flex items-start">
+                <i class="fas fa-clock text-secondary text-3xl mr-4 mt-1"></i>
+                <div>
+                    <h3 class="text-xl font-semibold mb-2">Экономия времени</h3>
+                    <p class="text-gray-400">Проверяйте знания без длительной подготовки экзаменационных материалов</p>
+                </div>
+            </div>
+            
+            <div class="flex items-start">
+                <i class="fas fa-user-shield text-danger text-3xl mr-4 mt-1"></i>
+                <div>
+                    <h3 class="text-xl font-semibold mb-2">Подготовка к сертификации</h3>
+                    <p class="text-gray-400">Тесты помогут подготовиться к профессиональным экзаменам по PostgreSQL</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CTA Section -->
+    <div class="max-w-4xl mx-auto bg-gray-800 rounded-lg p-8 text-center">
+        <h2 class="text-2xl font-bold mb-4">Готовы проверить свои знания?</h2>
+        <p class="text-gray-400 mb-6">Выберите интересующую вас категорию и начните тест прямо сейчас</p>
+        <a href="/using_psql" class="inline-block px-6 py-3 bg-gradient-to-r from-primary to-secondary rounded-lg hover:from-secondary hover:to-primary transition-all transform hover:scale-105 shadow-lg">
+            Начать тестирование
+        </a>
+    </div>
+
+    {{template "footer.html" .}}
+</body>
+</html>

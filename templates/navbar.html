@@ -1,0 +1,41 @@
+<!-- Навигационное меню -->
+<nav class="bg-gray-800 rounded-lg shadow-lg mb-8">
+    <div class="max-w-7xl mx-auto px-4">
+        <div class="flex items-center justify-between h-16">
+            <div class="flex items-center">
+                <span class="text-xl font-bold text-white">PostgreSQL <i class="fas fa-cog"></i> Тесты DBA-1</span>
+            </div>
+            
+            <div class="hidden md:block">
+                <div class="ml-10 flex items-baseline space-x-4">
+                    <a href="/" class="px-3 py-2 rounded-md text-sm font-medium text-white hover:bg-primary hover:text-white transition duration-150">
+                        Главная
+                    </a>
+                    
+                    <div class="relative group">
+                        <a href="#" class="px-3 py-2 rounded-md text-sm font-medium text-white hover:bg-primary hover:text-white transition duration-150 flex items-center">
+                            Тесты DBA-1
+                            <svg class="ml-1 h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                            </svg>
+                        </a>
+                        
+                        <div class="absolute left-0 mt-2 w-56 rounded-md shadow-lg bg-gray-700 ring-1 ring-black ring-opacity-5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-right scale-95 group-hover:scale-100">
+                            <div class="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
+                                <a href="/server_installation" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-600 hover:text-white" role="menuitem">
+                                    Установка и управление сервером
+                                </a>
+                                <a href="/using_psql" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-600 hover:text-white" role="menuitem">
+                                    Использование psql
+                                </a>
+                                <a href="/server_configuration" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-600 hover:text-white" role="menuitem">
+                                    Конфигурирование сервера
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>

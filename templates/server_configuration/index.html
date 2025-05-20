@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тестовые вопросы по PostgreSQL</title>
+    <link rel="icon" href="/static/images/favicon.ico" type="image/x-icon">
+
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"> <!-- <span class="material-icons">home</span> -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#1E40AF',
+                        success: '#10B981',
+                        danger: '#EF4444'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-900 text-white min-h-screen p-8">
+    {{template "navbar.html" .}}
+
+<div class="max-w-3xl mx-auto">
+    <h1 class="text-3xl font-bold mb-6 text-center">Конфигурирование сервера</h1>
+
+    <div id="quiz-container" class="space-y-8"></div>
+
+    <button onclick="checkAnswers()" class="mt-8 w-full py-3 bg-primary hover:bg-secondary text-white font-bold rounded-lg transition duration-300">
+        Проверить результат
+    </button>
+    
+    <div id="result" class="hidden mt-8 p-6 bg-gray-800 rounded-lg text-center">
+        <h2 class="text-2xl font-bold mb-4">Ваш результат:</h2>
+        <p id="percentage" class="text-4xl text-primary font-mono"></p>
+    </div>
+</div>
+
+<script>
+    const quizData = [
+        {
+            question: "Какой файл является основным конфигурационным для PostgreSQL?",
+            options: ["pg_hba.conf", "postgresql.conf", "pg_ident.conf", ".pgpass"],
+            answer: 1
+        },
+        {
+            question: "Какая команда перечитывает конфигурацию без перезапуска сервера?",
+            options: ["SELECT pg_reload_conf();", "pg_ctl restart", "service postgresql reload", "pg_ctlcluster 16 main reload"],
+            answer: 0
+        },
+        {
+            question: "Какой параметр определяет максимальное количество одновременных соединений?",
+            options: ["shared_buffers", "max_connections", "work_mem", "temp_buffers"],
+            answer: 1
+        },
+        {
+            question: "Какое представление показывает текущие значения параметров?",
+            options: ["pg_file_settings", "pg_settings", "pg_config", "pg_stat_statements"],
+            answer: 1
+        },
+        {
+            question: "Какой файл управляет правами доступа через хосты?",
+            options: ["postgresql.conf", "pg_hba.conf", "pg_ident.conf", ".pgpass"],
+            answer: 1
+        },
+        {
+            question: "Какой файл изменяется командой ALTER SYSTEM?",
+            options: ["postgresql.conf", "pg_hba.conf", "postgresql.auto.conf", "pg_ident.conf"],
+            answer: 2
+        },
+        {
+            question: "Какой параметр задает объем памяти для операций вроде сортировки?",
+            options: ["shared_buffers", "work_mem", "maintenance_work_mem", "temp_buffers"],
+            answer: 1
+        },
+        {
+            question: "Какой столбец в pg_settings показывает, требуется ли перезапуск для применения изменения?",
+            options: ["context", "pending_restart", "applied", "source"],
+            answer: 2
+        },
+        {
+            question: "Как создать пользовательский параметр в PostgreSQL?",
+            options: ["Использовать SET LOCAL", "Указать точку в имени (например, myapp.currency_code)", "Через pg_ident.conf", "С помощью функции set_config()"],
+            answer: 1
+        },
+        {
+            question: "Какой параметр задает каталог с данными (PGDATA)?",
+            options: ["data_directory", "external_pid_file", "hba_file", "cluster_name"],
+            answer: 0
+        },
+        {
+            question: "Какое значение столбца pending_restart указывает, что для применения изменения требуется перезапуск сервера?",
+            options: ["true", "false", "null", "applied"],
+            answer: 0
+        },
+        {
+            question: "Какой столбец в pg_settings показывает, из какого файла взято значение параметра?",
+            options: ["sourcefile", "applied", "context", "setting"],
+            answer: 0
+        },
+        {
+            question: "Какой контекст параметра требует перезапуска сервера для применения изменений?",
+            options: ["user", "sighup", "postmaster", "superuser"],
+            answer: 2
+        },
+        {
+            question: "Какая команда удаляет параметр из файла postgresql.auto.conf?",
+            options: ["ALTER SYSTEM RESET", "ALTER SYSTEM SET", "RESET", "SET LOCAL"],
+            answer: 0
+        },
+        {
+            question: "Какое значение контекста позволяет любому пользователю изменить параметр для своего сеанса?",
+            options: ["internal", "sighup", "user", "postmaster"],
+            answer: 2
+        },
+        {
+            question: "Какая команда временно устанавливает параметр только для текущей транзакции?",
+            options: ["SET", "SET LOCAL", "set_config(..., true)", "ALTER SYSTEM"],
+            answer: 2
+        },
+        {
+            question: "Какой параметр определяет, где хранится файл PID сервера?",
+            options: ["data_directory", "external_pid_file", "hba_file", "cluster_name"],
+            answer: 1
+        },
+        {
+            question: "Какой директивой можно подключить дополнительный файл конфигурации, если он существует?",
+            options: ["include", "include_dir", "include_if_exists", "config_file"],
+            answer: 2
+        },
+        {
+            question: "Какой столбец в pg_file_settings показывает, будет ли изменение применено при перечитывании?",
+            options: ["applied", "error", "sourceline", "name"],
+            answer: 0
+        },
+        {
+            question: "Как создать пользовательский параметр в PostgreSQL?",
+            options: ["Использовать SET LOCAL", "Указать точку в имени (например, myapp.currency_code)", "Через pg_ident.conf", "С помощью функции set_config()"],
+            answer: 1
+        }
+    ];
+
+    function createQuiz() {
+        const container = document.getElementById('quiz-container');
+        
+        // Количество вопросов для отображения (можно изменить)
+        const numQuestionsToShow = 10;
+        
+        // Создаем копию массива вопросов
+        const shuffledQuestions = [...quizData];
+        
+        // Перемешиваем вопросы случайным образом
+        for (let i = shuffledQuestions.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffledQuestions[i], shuffledQuestions[j]] = [shuffledQuestions[j], shuffledQuestions[i]];
+        }
+        
+        // Выбираем нужное количество вопросов (или все, если их меньше)
+        const selectedQuestions = shuffledQuestions.slice(0, Math.min(numQuestionsToShow, shuffledQuestions.length));
+        
+        // Сохраняем выбранные вопросы для проверки ответов
+        window.selectedQuizData = selectedQuestions;
+        
+        // Отображаем выбранные вопросы
+        selectedQuestions.forEach((item, index) => {
+            const questionDiv = document.createElement('div');
+            questionDiv.className = "bg-gray-800 p-6 rounded-lg";
+            questionDiv.innerHTML = `
+                <h2 class="text-xl font-semibold mb-4">${index + 1}. ${item.question}</h2>
+                <div class="space-y-2">
+                    ${item.options.map((option, i) => `
+                        <label class="flex items-center space-x-3 p-2 rounded-md hover:bg-gray-700 answer-label">
+                            <input type="radio" name="q${index}" value="${i}" class="w-4 h-4 text-primary focus:ring-primary">
+                            <span>${option}</span>
+                        </label>
+                    `).join('')}
+                </div>
+            `;
+            container.appendChild(questionDiv);
+        });
+    }
+
+    function checkAnswers() {
+        let correct = 0;
+        let hasUnanswered = false;
+        const resultDiv = document.getElementById('result');
+        const percentage = document.getElementById('percentage');
+        
+        // Получаем выбранные вопросы из глобальной переменной
+        const selectedQuestions = window.selectedQuizData || [];
+
+        document.querySelectorAll('.answer-label').forEach(label => {
+            label.classList.remove('bg-green-900/20', 'bg-red-900/20', 'border', 'border-success', 'border-danger');
+        });
+
+        for (let i = 0; i < selectedQuestions.length; i++) {
+            if (!document.querySelector(`input[name="q${i}"]:checked`)) {
+                hasUnanswered = true;
+                break;
+            }
+        }
+
+        if (hasUnanswered) {
+            alert('Пожалуйста, ответьте на все вопросы!');
+            return;
+        }
+
+        selectedQuestions.forEach((item, index) => {
+            const selected = document.querySelector(`input[name="q${index}"]:checked`);
+            if (selected) {
+                const selectedLabel = selected.closest('.answer-label');
+                const correctLabel = document.querySelector(`input[name="q${index}"][value="${item.answer}"]`).closest('.answer-label');
+                if (parseInt(selected.value) === item.answer) {
+                    correctLabel.classList.add('bg-green-900/20', 'border', 'border-success');
+                    correct++;
+                } else {
+                    selectedLabel.classList.add('bg-red-900/20', 'border', 'border-danger');
+                    correctLabel.classList.add('bg-green-900/20', 'border', 'border-success');
+                }
+            }
+        });
+
+        const percent = (correct / selectedQuestions.length) * 100;
+        percentage.textContent = `${percent.toFixed(1)}%`;
+        resultDiv.classList.remove('hidden');
+        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    }
+
+    window.onload = createQuiz;
+</script>
+
+    {{template "footer.html" .}}
+</body>
+</html>
