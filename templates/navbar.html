@@ -1,3 +1,4 @@
+{{ define "navbar.html" }}
 <!-- Навигационное меню -->
 <nav class="bg-gray-800 rounded-lg shadow-lg mb-8">
     <div class="max-w-7xl mx-auto px-4">
@@ -31,6 +32,9 @@
                                 <a href="/server_configuration" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-600 hover:text-white" role="menuitem">
                                     Конфигурирование сервера
                                 </a>
+                                <a href="/postgres_quiz" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-600 hover:text-white" role="menuitem">
+                                    Тест по PostgreSQL
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -39,3 +43,4 @@
         </div>
     </div>
 </nav>
+{{ end }}

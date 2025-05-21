@@ -3,3 +3,5 @@ report.html
 *.bak
 *.sh
 *.txt
+internal/handlers/quiz_data.go
+main
