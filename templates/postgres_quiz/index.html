@@ -48,202 +48,202 @@
 <script>
     const quizData = [
     {
-        question: "Какой процесс в PostgreSQL 16 отвечает за запуск и контроль других процессов сервера?",
+        question: "Какой процесс в PostgreSQL отвечает за запуск и контроль других процессов сервера?",
         options: ["backend", "pgBouncer", "postmaster", "pg_prepared_statements"],
         answer: 2
     },
     {
-        question: "Какой механизм в PostgreSQL 16 обеспечивает конкурентный доступ без блокировок?",
+        question: "Какой механизм в PostgreSQL обеспечивает конкурентный доступ без блокировок?",
         options: ["Блокировки таблиц", "MVCC", "Курсоры", "Подготовленные операторы"],
         answer: 1
     },
     {
-        question: "Какой параметр в PostgreSQL 16 включает JIT-компиляцию запросов?",
+        question: "Какой параметр в PostgreSQL включает JIT-компиляцию запросов?",
         options: ["jit = on", "enable_jit = on", "optimize_jit = true", "use_jit = yes"],
         answer: 1
     },
     {
-        question: "Какой объект в логической репликации PostgreSQL 16 описывает источник данных?",
+        question: "Какой объект в логической репликации PostgreSQL описывает источник данных?",
         options: ["Подписка (Subscription)", "Публикация (Publication)", "Слот репликации", "WAL-отправитель"],
         answer: 1
     },
     {
-        question: "Какой тип сегментирования (partitioning) в PostgreSQL 16 НЕ поддерживается?",
+        question: "Какой тип сегментирования (partitioning) в PostgreSQL НЕ поддерживается?",
         options: ["По диапазону (RANGE)", "По списку (LIST)", "По хэшу (HASH)", "По графу (GRAPH)"],
         answer: 3
     },
     {
-        question: "Какой запрос покажет активные транзакции в PostgreSQL 16?",
+        question: "Какой запрос покажет активные транзакции в PostgreSQL?",
         options: ["SELECT * FROM pg_stat_activity", "SHOW TRANSACTIONS", "EXPLAIN ANALYZE", "CHECKPOINT"],
         answer: 0
     },
     {
-        question: "Какой параметр в PostgreSQL 16 ускоряет аналитические запросы через распараллеливание?",
+        question: "Какой параметр в PostgreSQL ускоряет аналитические запросы через распараллеливание?",
         options: ["max_parallel_workers_per_gather", "work_mem", "shared_buffers", "random_page_cost"],
         answer: 0
     },
     {
-        question: "Какой оператор PostgreSQL 16 выполняет «горячее» обновление индексов (без блокировки)?",
+        question: "Какой оператор PostgreSQL выполняет «горячее» обновление индексов (без блокировки)?",
         options: ["REINDEX CONCURRENTLY", "VACUUM FULL", "ANALYZE", "CLUSTER"],
         answer: 0
     },
     {
-        question: "Какой тип индекса в PostgreSQL 16 лучше для поиска по префиксу строки?",
+        question: "Какой тип индекса в PostgreSQL лучше для поиска по префиксу строки?",
         options: ["B-tree", "GIN", "GiST", "BRIN"],
         answer: 0
     },
     {
-        question: "Какой файл в PostgreSQL 16 настраивает доступ к кластеру?",
+        question: "Какой файл в PostgreSQL настраивает доступ к кластеру?",
         options: ["postgresql.conf", "pg_hba.conf", "pg_ident.conf", "recovery.conf"],
         answer: 1
     },
     {
-        question: "Какой размер страницы данных по умолчанию в PostgreSQL 16?",
+        question: "Какой размер страницы данных по умолчанию в PostgreSQL?",
         options: ["4 КБ", "8 КБ", "16 КБ", "32 КБ"],
         answer: 1
     },
     {
-        question: "Какой процесс записывает WAL-журналы на диск в PostgreSQL 16?",
+        question: "Какой процесс записывает WAL-журналы на диск в PostgreSQL?",
         options: ["checkpointer", "bgwriter", "walwriter", "autovacuum"],
         answer: 2
     },
     {
-        question: "Какой параметр ограничивает максимальное число подключений в PostgreSQL 16?",
+        question: "Какой параметр ограничивает максимальное число подключений в PostgreSQL?",
         options: ["max_connections", "shared_buffers", "work_mem", "max_wal_size"],
         answer: 0
     },
     {
-        question: "Какой тип JSON в PostgreSQL 16 поддерживает индексацию?",
+        question: "Какой тип JSON в PostgreSQL поддерживает индексацию?",
         options: ["JSON", "JSONB", "JSONPATH", "HSTORE"],
         answer: 1
     },
     {
-        question: "Какой процесс автоматически выполняет VACUUM в PostgreSQL 16?",
+        question: "Какой процесс автоматически выполняет VACUUM в PostgreSQL?",
         options: ["checkpointer", "autovacuum launcher", "walwriter", "stats collector"],
         answer: 1
     },
     {
-        question: "Какой уровень изоляции транзакций использует снимки данных (snapshots) в PostgreSQL 16?",
+        question: "Какой уровень изоляции транзакций использует снимки данных (snapshots) в PostgreSQL?",
         options: ["Read uncommitted", "Read committed", "Repeatable read", "Serializable"],
         answer: 2
     },
     {
-        question: "Какой тип данных для денежных значений рекомендуется в PostgreSQL 16?",
+        question: "Какой тип данных для денежных значений рекомендуется в PostgreSQL?",
         options: ["FLOAT", "DOUBLE PRECISION", "NUMERIC", "DECIMAL"],
         answer: 2
     },
     {
-        question: "Какой параметр WAL включает логическую репликацию в PostgreSQL 16?",
+        question: "Какой параметр WAL включает логическую репликацию в PostgreSQL?",
         options: ["wal_level=minimal", "wal_level=replica", "wal_level=logical", "wal_level=full"],
         answer: 2
     },
     {
-        question: "Какой индекс оптимален для полнотекстового поиска в PostgreSQL 16?",
+        question: "Какой индекс оптимален для полнотекстового поиска в PostgreSQL?",
         options: ["B-tree", "GIN", "GiST", "BRIN"],
         answer: 1
     },
     {
-        question: "Какой процесс отправляет WAL-данные на реплику в PostgreSQL 16?",
+        question: "Какой процесс отправляет WAL-данные на реплику в PostgreSQL?",
         options: ["walreceiver", "walsender", "logical replication worker", "pg_basebackup"],
         answer: 1
     },
     {
-        question: "Как создать триггер в PostgreSQL 16?",
+        question: "Как создать триггер в PostgreSQL?",
         options: ["CREATE TRIGGER", "CREATE RULE", "CREATE EVENT TRIGGER", "Все варианты верны"],
         answer: 0
     },
     {
-        question: "Какой параметр контролирует параллельные запросы в PostgreSQL 16?",
+        question: "Какой параметр контролирует параллельные запросы в PostgreSQL?",
         options: ["max_parallel_workers", "max_parallel_workers_per_gather", "parallel_setup_cost", "Все варианты верны"],
         answer: 3
     },
     {
-        question: "Какой тип временных меток включает часовой пояс в PostgreSQL 16?",
+        question: "Какой тип временных меток включает часовой пояс в PostgreSQL?",
         options: ["TIMESTAMP", "TIMESTAMPTZ", "TIME WITH TIME ZONE", "INTERVAL"],
         answer: 1
     },
     {
-        question: "Какой компонент управляет расширениями в PostgreSQL 16?",
+        question: "Какой компонент управляет расширениями в PostgreSQL?",
         options: ["pg_extension", "CREATE EXTENSION", "Shared Library", "Расширения недоступны"],
         answer: 1
     },
     {
-        question: "Какой тип данных хранит бинарные объекты (например, изображения) в PostgreSQL 16?",
+        question: "Какой тип данных хранит бинарные объекты (например, изображения) в PostgreSQL?",
         options: ["TEXT", "BLOB", "BYTEA", "OID"],
         answer: 2
     },
     {
-        question: "Какой процесс восстанавливает данные после сбоя в PostgreSQL 16?",
+        question: "Какой процесс восстанавливает данные после сбоя в PostgreSQL?",
         options: ["recovery", "startup", "checkpointer", "walreceiver"],
         answer: 1
     },
     {
-        question: "Как создать функцию на Python в PostgreSQL 16?",
+        question: "Как создать функцию на Python в PostgreSQL?",
         options: ["CREATE FUNCTION ... LANGUAGE python", "CREATE FUNCTION ... LANGUAGE plpython3", "USE PL/Python", "Python не поддерживается"],
         answer: 1
     },
     {
-        question: "Какой механизм обеспечивает долговечность данных при сбое питания в PostgreSQL 16?",
+        question: "Какой механизм обеспечивает долговечность данных при сбое питания в PostgreSQL?",
         options: ["Буферный кеш", "WAL", "Репликация", "Точки сохранения"],
         answer: 1
     },
     {
-        question: "Какой инструмент анализирует статистику запросов в PostgreSQL 16?",
+        question: "Какой инструмент анализирует статистику запросов в PostgreSQL?",
         options: ["pg_stat_statements", "EXPLAIN ANALYZE", "pgBadger", "Все варианты верны"],
         answer: 3
     },
     {
-        question: "Какой тип блокировки защищает таблицы от DDL-изменений в PostgreSQL 16?",
+        question: "Какой тип блокировки защищает таблицы от DDL-изменений в PostgreSQL?",
         options: ["Row-level locks", "Advisory locks", "Table-level locks", "Deadlock detection"],
         answer: 2
     },
     {
-        question: "Какой параметр настраивает размер буферного кеша в PostgreSQL 16?",
+        question: "Какой параметр настраивает размер буферного кеша в PostgreSQL?",
         options: ["work_mem", "maintenance_work_mem", "shared_buffers", "temp_buffers"],
         answer: 2
     },
     {
-        question: "Какой режим протокола поддерживает курсоры в PostgreSQL 16?",
+        question: "Какой режим протокола поддерживает курсоры в PostgreSQL?",
         options: ["Простой режим", "Расширенный режим", "Режим автофиксации", "Режим транзакций"],
         answer: 1
     },
     {
-        question: "Какой объект создается при открытии курсора в PostgreSQL 16?",
+        question: "Какой объект создается при открытии курсора в PostgreSQL?",
         options: ["Портал (Portal)", "Точка сохранения", "План выполнения", "Системный каталог"],
         answer: 0
     },
     {
-        question: "Где хранятся планы запросов в PostgreSQL 16?",
+        question: "Где хранятся планы запросов в PostgreSQL?",
         options: ["Буферный кеш", "Общая память", "Локальная память backend-процесса", "WAL-журнал"],
         answer: 2
     },
     {
-        question: "Какой файл содержит глобальные настройки psql в PostgreSQL 16?",
+        question: "Какой файл содержит глобальные настройки psql в PostgreSQL?",
         options: ["~/.psqlrc", "/etc/postgresql-common/psqlrc", "postgresql.conf", "pg_hba.conf"],
         answer: 1
     },
     {
-        question: "Какой уровень изоляции соответствует стандарту SQL 'READ COMMITTED' в PostgreSQL 16?",
+        question: "Какой уровень изоляции соответствует стандарту SQL 'READ COMMITTED' в PostgreSQL?",
         options: ["Read uncommitted", "Read committed", "Repeatable read", "Serializable"],
         answer: 1
     },
     {
-        question: "Какая команда начинает транзакцию в PostgreSQL 16?",
+        question: "Какая команда начинает транзакцию в PostgreSQL?",
         options: ["BEGIN", "START TRANSACTION", "BEGIN WORK", "Все варианты верны"],
         answer: 3
     },
     {
-        question: "Какой тип индекса использует B-дерево по умолчанию в PostgreSQL 16?",
+        question: "Какой тип индекса использует B-дерево по умолчанию в PostgreSQL?",
         options: ["GiST", "GIN", "BRIN", "B-tree"],
         answer: 3
     },
     {
-        question: "Какой процесс записывает «грязные» страницы на диск в PostgreSQL 16?",
+        question: "Какой процесс записывает «грязные» страницы на диск в PostgreSQL?",
         options: ["checkpointer", "bgwriter", "walwriter", "autovacuum"],
         answer: 0
     },
     {
-        question: "Какой тип данных хранит геометрические объекты в PostgreSQL 16?",
+        question: "Какой тип данных хранит геометрические объекты в PostgreSQL?",
         options: ["POINT", "POLYGON", "GEOMETRY", "Все варианты верны"],
         answer: 3
     }
