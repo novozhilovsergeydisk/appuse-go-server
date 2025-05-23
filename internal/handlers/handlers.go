@@ -183,6 +183,8 @@ func PostgreSQLQuiz(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
+
+// ConcurrentAccessManagement обрабатывает страницу с тестом по управлению параллельным доступом
 func ConcurrentAccessManagement(w http.ResponseWriter, r *http.Request) {
 	// Полные пути к шаблонам
 	indexPath := filepath.Join("templates", "concurrent_access_management", "index.html")
@@ -192,6 +194,36 @@ func ConcurrentAccessManagement(w http.ResponseWriter, r *http.Request) {
 	// Проверка существования файлов
 	if _, err := os.Stat(indexPath); os.IsNotExist(err) {
 		http.Error(w, "Concurrent Access Management template not found", http.StatusInternalServerError)
+		return
+	}
+	if _, err := os.Stat(navbarPath); os.IsNotExist(err) {
+		http.Error(w, "Navbar template not found", http.StatusInternalServerError)
+		return
+	}
+	if _, err := os.Stat(footerPath); os.IsNotExist(err) {
+		http.Error(w, "Footer template not found", http.StatusInternalServerError)
+		return
+	}
+	// Парсинг шаблонов
+	tmpl := template.Must(template.ParseFiles(indexPath, navbarPath, footerPath))
+
+	// Рендеринг
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	if err := tmpl.Execute(w, nil); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
+// Vacuum обрабатывает страницу с тестом по вакууму
+func Vacuum(w http.ResponseWriter, r *http.Request) {
+	// Полные пути к шаблонам
+	indexPath := filepath.Join("templates", "vacuum", "index.html")
+	navbarPath := filepath.Join("templates", "navbar.html")
+	footerPath := filepath.Join("templates", "footer.html")
+
+	// Проверка существования файлов
+	if _, err := os.Stat(indexPath); os.IsNotExist(err) {
+		http.Error(w, "Index template not found", http.StatusInternalServerError)
 		return
 	}
 	if _, err := os.Stat(navbarPath); os.IsNotExist(err) {
