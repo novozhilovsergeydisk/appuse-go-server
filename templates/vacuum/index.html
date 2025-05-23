@@ -228,7 +228,8 @@
                     "pg_buffercache",
                     "pg_clog"
                 ],
-                answer: 1
+                answer: 1,
+                comment: "Правильный ответ: pg_xact (ранее pg_clog)"
             },
             {
                 question: "Что показывает параметр tuple_percent в выводе pgstattuple?",
@@ -266,7 +267,7 @@
                     "autovacuum_vacuum_threshold",
                     "autovacuum_analyze_threshold",
                     "autovacuum_vacuum_scale_factor",
-                    "autovacuum_max_workers"
+                    "autovacuum_freeze_max_age"
                 ],
                 answer: 0
             },
@@ -304,14 +305,14 @@
                 question: "Какой механизм помогает оптимизатору запросов выбрать эффективный план?",
                 options: [
                     "MVCC",
-                    "Карта свободного пространства",
-                    "Статистика таблицы",
-                    "Карта видимости"
+                    "Карта видимости",
+                    "WAL",
+                    "Карта свободного пространства"
                 ],
                 answer: 2
             },
             {
-                question: "Какой уровень изоляции может увеличить объем мертвых версий строк?",
+                question: "Какой уровень изоляции может увеличить число мертвых версий строк?",
                 options: [
                     "Read Committed",
                     "Repeatable Read",
@@ -470,16 +471,7 @@
                 ],
                 answer: 0
             },
-            {
-                question: "Какой файл в PostgreSQL содержит информацию о статусе транзакций?",
-                options: [
-                    "pg_xact",
-                    "pg_wal",
-                    "pg_fsm",
-                    "pg_clog"
-                ],
-                answer: 3
-            },
+
             {
                 question: "Какой уровень изоляции может привести к фантомному чтению при очистке?",
                 options: [
