@@ -17,6 +17,7 @@ func main() {
 	mux.HandleFunc("/using_psql", handlers.UsingPsql)
 	mux.HandleFunc("/server_installation", handlers.ServerInstallation)
 	mux.HandleFunc("/postgres_quiz", handlers.PostgreSQLQuiz)
+	mux.HandleFunc("/concurrent_access_management", handlers.ConcurrentAccessManagement)
 
 	// Настройка обработки статических файлов
 	staticDir := "static"
