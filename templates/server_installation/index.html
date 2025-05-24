@@ -47,29 +47,179 @@
 <script>
     const quizData = [
         {
-            question: "Какая команда используется для инициализации кластера PostgreSQL?",
-            options: ["pg_ctl init", "initdb", "pg_init", "postgres --init"],
-            answer: 1
-        },
-        {
-            question: "Где по умолчанию хранятся данные PostgreSQL в Linux?",
-            options: ["/var/lib/postgresql/data", "/etc/postgresql", "/usr/local/pgsql/data", "/opt/postgresql/data"],
+            question: "Какой каталог по умолчанию используется для установки PostgreSQL через configure?",
+            options: ["/usr/local/pgsql", "/var/lib/postgresql", "/home/student/pgsql16", "/etc/postgresql"],
             answer: 0
         },
         {
-            question: "Какая команда используется для запуска сервера PostgreSQL?",
-            options: ["pg_ctl start", "postgres -D", "pg_start", "postgresql start"],
+            question: "Какая команда очищает остатки предыдущей сборки PostgreSQL из исходников?",
+            options: ["make clean", "make distclean", "make uninstall", "make reset"],
+            answer: 1
+        },
+        {
+            question: "Какой параметр configure задаёт порт сервера PostgreSQL?",
+            options: ["--with-port", "--enable-port", "--with-pgport", "--server-port"],
+            answer: 2
+        },
+        {
+            question: "Какая команда собирает только сервер PostgreSQL без расширений и документации?",
+            options: ["make world", "make all", "make", "make install"],
+            answer: 2
+        },
+        {
+            question: "Какая утилита инициализирует кластер баз данных PostgreSQL?",
+            options: ["pg_ctl", "initdb", "pg_createcluster", "pg_setup"],
+            answer: 1
+        },
+        {
+            question: "Какой ключ в initdb включает проверку контрольных сумм страниц данных?",
+            options: ["-c", "-k", "--checksums", "--data-checksums"],
+            answer: 3
+        },
+        {
+            question: "Какая переменная окружения указывает на каталог кластера PostgreSQL?",
+            options: ["PGHOME", "PGDATA", "POSTGRES_DIR", "PG_CLUSTER"],
+            answer: 1
+        },
+        {
+            question: "Как добавить путь к бинарникам PostgreSQL в переменную PATH?",
+            options: ["export PATH=/usr/lib/postgresql/16/bin:$PATH", "export PATH=/home/student/pgsql16/bin:$PATH", "export PATH=$PATH:/usr/local/pgsql/bin", "Все варианты верны"],
+            answer: 3
+        },
+        {
+            question: "Какая команда запускает сервер PostgreSQL в Ubuntu через pg_ctlcluster?",
+            options: ["pg_ctl start", "sudo pg_ctlcluster 16 main start", "systemctl start postgresql", "service postgresql start"],
+            answer: 1
+        },
+        {
+            question: "Где хранится журнал сервера PostgreSQL при пакетной установке в Ubuntu?",
+            options: ["/var/log/postgresql/postgresql-16-main.log", "/home/student/logfile", "/usr/local/pgsql/data/pg_log", "/etc/postgresql/logs"],
+            answer: 0
+        },
+        {
+            question: "Какая команда перечитывает конфигурационные файлы PostgreSQL без перезапуска?",
+            options: ["pg_ctl reload", "sudo pg_ctlcluster 16 main reload", "pg_reload", "make reload"],
+            answer: 1
+        },
+        {
+            question: "Какой пользователь ОС обычно владеет каталогом кластера PostgreSQL в Ubuntu?",
+            options: ["student", "root", "postgres", "admin"],
+            answer: 2
+        },
+        {
+            question: "Какой каталог содержит данные кластера по умолчанию в Ubuntu?",
+            options: ["/home/student/pgsql16/data", "/var/lib/postgresql/16/main", "/usr/local/pgsql/data", "/etc/postgresql/16/main"],
+            answer: 1
+        },
+        {
+            question: "Какая утилита управляет несколькими версиями PostgreSQL в Ubuntu?",
+            options: ["pg_ctl", "pg_ctlcluster", "initdb", "pg_multi"],
+            answer: 1
+        },
+        {
+            question: "Как проверить статус сервера PostgreSQL в Ubuntu?",
+            options: ["pg_ctl status", "sudo pg_ctlcluster 16 main status", "systemctl status postgresql", "Все варианты верны"],
+            answer: 3
+        },
+        {
+            question: "Какая команда собирает расширения PostgreSQL после основной установки?",
+            options: ["make install-world", "cd contrib && make && make install", "make contrib", "make extensions"],
+            answer: 1
+        },
+        {
+            question: "Какой параметр configure включает отладочную информацию?",
+            options: ["--enable-debug", "--with-debug", "--debug", "--build-debug"],
             answer: 0
         },
         {
             question: "Какой порт использует PostgreSQL по умолчанию?",
-            options: ["5432", "3306", "8080", "1521"],
+            options: ["5555", "5432", "3306", "1433"],
+            answer: 1
+        },
+        {
+            question: "Какая команда останавливает сервер PostgreSQL в Ubuntu?",
+            options: ["sudo pg_ctlcluster 16 main stop", "pg_ctl stop", "systemctl stop postgresql", "Все варианты верны"],
+            answer: 3
+        },
+        {
+            question: "Какая утилита проверяет контрольные суммы страниц данных после создания кластера?",
+            options: ["pg_checksums", "initdb", "pg_verify", "pg_check"],
             answer: 0
         },
         {
-            question: "Какой файл отвечает за аутентификацию в PostgreSQL?",
-            options: ["postgresql.conf", "pg_hba.conf", "pg_ident.conf", "pg_auth.conf"],
-            answer: 1
+            question: "Какие инструменты требуются при сборке PostgreSQL из Git-репозитория?",
+            options: ["Flex и Bison", "Make и GCC", "CMake и LLVM", "Autoconf и Automake"],
+            answer: 0
+        },
+        {
+            question: "Какая переменная окружения задаёт компилятор C при сборке PostgreSQL?",
+            options: ["CC", "CXX", "CPP", "GCC"],
+            answer: 0
+        },
+        {
+            question: "Какая команда в Ubuntu управляет несколькими версиями PostgreSQL и перезапускает сервер?",
+            options: ["pg_ctlcluster restart", "systemctl restart postgresql", "pg_restartcluster", "make restart"],
+            answer: 0
+        },
+        {
+            question: "Какой параметр команды pg_ctl указывает файл журнала сервера?",
+            options: ["-l", "-f", "-o", "-D"],
+            answer: 0
+        },
+        {
+            question: "Как проверить, включены ли контрольные суммы в существующем кластере PostgreSQL?",
+            options: ["Использовать pg_checksums", "Посмотреть в postgresql.conf", "Запустить initdb -k", "Проверить через psql"],
+            answer: 0
+        },
+        {
+            question: "Какой файл содержит автоматически сгенерированные параметры конфигурации сервера в Ubuntu?",
+            options: ["postgresql.auto.conf", "postgresql.conf", "pg_hba.conf", "postmaster.opts"],
+            answer: 0
+        },
+        {
+            question: "Какой параметр configure включает поддержку Python в PostgreSQL?",
+            options: ["--with-python", "--enable-python", "--include-python", "--add-python"],
+            answer: 0
+        },
+        {
+            question: "Какой каталог содержит бинарные файлы PostgreSQL при пакетной установке в Ubuntu?",
+            options: ["/usr/lib/postgresql/16/bin", "/var/lib/postgresql/16/main", "/home/student/pgsql16/bin", "/etc/postgresql/16/main"],
+            answer: 0
+        },
+        {
+            question: "Какая команда в Ubuntu удаляет существующий кластер PostgreSQL?",
+            options: ["pg_dropcluster", "pg_removecluster", "pg_deletecluster", "pg_destroycluster"],
+            answer: 0
+        },
+        {
+            question: "Какая утилита показывает параметры сборки PostgreSQL (например, порт или каталог установки)?",
+            options: ["pg_config", "pg_ctl", "initdb", "pg_ctlcluster"],
+            answer: 0
+        },
+        {
+            question: "Какой параметр команды make собирает сервер, расширения и документацию одновременно?",
+            options: ["make world", "make all", "make install", "make contrib"],
+            answer: 0
+        },
+        {
+            question: "Как включить поддержку SSL при конфигурации PostgreSQL?",
+            options: ["--with-openssl", "--enable-ssl", "--ssl-support", "--with-ssl"],
+            answer: 0
+        },
+        {
+            question: "Какой файл содержит PID-процесса сервера PostgreSQL в Ubuntu?",
+            options: ["postmaster.pid", "postgresql.pid", "pg_ctl.pid", "server.pid"],
+            answer: 0
+        },
+        {
+            question: "Какая команда выводит список активных кластеров PostgreSQL в Ubuntu?",
+            options: ["pg_lsclusters", "pg_listclusters", "pg_showclusters", "pg_clusters"],
+            answer: 0
+        },
+        {
+            question: "Какой параметр переменной CFLAGS включает отладочную информацию при сборке?",
+            options: ["-g", "-O2", "-flto=auto", "-Werror"],
+            answer: 0
         }
     ];
 
