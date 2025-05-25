@@ -25,6 +25,11 @@ func main() {
 	fileServer := http.FileServer(http.Dir(staticDir))
 	mux.Handle("/static/", http.StripPrefix("/static/", fileServer))
 
+	// Обработка favicon.ico
+	mux.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "static/images/favicon.ico")
+	})
+
 	// Настройка обработки 404
 	mux.HandleFunc("/not-found", handlers.NotFound)
 
