@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Тестовые вопросы по PostgreSQL</title>
+    <title>Конфигурирование сервера</title>
     <link rel="icon" href="/static/images/favicon.ico" type="image/x-icon">
-
+    
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"> <!-- <span class="material-icons">home</span> -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -26,23 +26,23 @@
         }
     </script>
 </head>
-<body class="bg-gray-900 text-white min-h-screen p-8">
+<body class="bg-gray-900 text-white min-h-screen p-4 md:p-8">
     {{template "navbar.html" .}}
 
-<div class="max-w-3xl mx-auto">
-    <h1 class="text-3xl font-bold mb-6 text-center">Конфигурирование сервера</h1>
+    <div class="max-w-3xl mx-auto">
+        <h1 class="text-3xl font-bold mb-6 text-center">Конфигурирование сервера</h1>
+        
+        <div id="quiz-container" class="space-y-8"></div>
 
-    <div id="quiz-container" class="space-y-8"></div>
+        <button onclick="checkAnswers()" class="mt-8 w-full py-3 bg-primary hover:bg-secondary text-white font-bold rounded-lg transition duration-300">
+            Проверить результат
+        </button>
 
-    <button onclick="checkAnswers()" class="mt-8 w-full py-3 bg-primary hover:bg-secondary text-white font-bold rounded-lg transition duration-300">
-        Проверить результат
-    </button>
-    
-    <div id="result" class="hidden mt-8 p-6 bg-gray-800 rounded-lg text-center">
-        <h2 class="text-2xl font-bold mb-4">Ваш результат:</h2>
-        <p id="percentage" class="text-4xl text-primary font-mono"></p>
+        <div id="result" class="hidden mt-8 p-6 bg-gray-800 rounded-lg text-center">
+            <h2 class="text-2xl font-bold mb-4">Ваш результат:</h2>
+            <p id="percentage" class="text-4xl text-primary font-mono"></p>
+        </div>
     </div>
-</div>
 
 <script>
     const quizData = [
