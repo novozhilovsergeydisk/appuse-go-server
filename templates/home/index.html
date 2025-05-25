@@ -260,7 +260,7 @@
                 
                 // Create headers with properly encoded values
                 const headers = new Headers();
-                headers.append('Authorization', 'Bearer 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');
+                headers.append('Authorization', 'Bearer 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');
                 headers.append('HTTP-Referer', window.location.href);
                 headers.append('X-Title', 'PostgreSQL Tests DBA-1');
                 headers.append('Content-Type', 'application/json');
@@ -269,7 +269,7 @@
                     method: "POST",
                     headers: headers,
                     body: JSON.stringify({
-                        "model": "qwen/qwen3-30b-a3b:free",
+                        "model": "qwen/qwen3-14b",
                         "messages": [
                             {
                                 "role": "system",
