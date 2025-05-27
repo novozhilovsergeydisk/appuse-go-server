@@ -47,1486 +47,219 @@
     <script>
         const quizData = [
             {
-                question: "Какой процесс в PostgreSQL отвечает за автоматическую очистку таблиц?",
-                options: [
-                    "pgBouncer",
-                    "autovacuum worker",
-                    "pg_repack",
-                    "bgwriter"
-                ],
-                answer: 1
-            },
-            {
-                question: "Что делает команда VACUUM FULL?",
-                options: [
-                    "Обновляет статистику без изменения данных",
-                    "Полностью перезаписывает таблицу и индексы",
-                    "Блокирует таблицу и удаляет все мертвые версии строк",
-                    "Перестраивает индексы без блокировки таблицы"
-                ],
-                answer: 1
-            },
-            {
-                question: "Какая из перечисленных задач НЕ относится к функциям VACUUM?",
-                options: [
-                    "Обновление карты свободного пространства",
-                    "Сбор статистики для оптимизатора",
-                    "Физическое удаление мертвых версий строк",
-                    "Перераспределение данных между страницами"
-                ],
-                answer: 3
-            },
-            {
-                question: "Что отслеживает карта свободного пространства (FSM)?",
-                options: [
-                    "Статусы транзакций",
-                    "Объем свободного места для вставки новых данных",
-                    "Изменения в системном каталоге",
-                    "Активные блокировки на уровне страницы"
-                ],
-                answer: 1
-            },
-            {
-                question: "Какой инструмент позволяет оценить разрастание таблиц и индексов?",
-                options: [
-                    "pg_stat_statements",
-                    "pgstattuple",
-                    "pg_waldump",
-                    "pg_repack"
-                ],
-                answer: 1
-            },
-            {
-                question: "Какой уровень разрастания таблицы может привести к остановке сервера?",
-                options: [
-                    "Когда tuple_percent > 90%",
-                    "Когда dead_tuple_percent > 50%",
-                    "Когда free_percent < 1%",
-                    "Когда autovacuum отключен на длительный срок"
-                ],
-                answer: 3
-            },
-            {
-                question: "Какой параметр конфигурации влияет на работу автоочистки?",
-                options: [
-                    "work_mem",
-                    "shared_buffers",
-                    "track_counts",
-                    "random_page_cost"
-                ],
-                answer: 2
-            },
-            {
-                question: "Что происходит с освобожденным местом после выполнения обычного VACUUM?",
-                options: [
-                    "Место возвращается операционной системе",
-                    "Место удаляется из файла таблицы",
-                    "Место остается в файле для новых данных",
-                    "Место шифруется для безопасности"
-                ],
-                answer: 2
-            },
-            {
-                question: "Какой процесс запускает рабочие процессы autovacuum worker?",
-                options: [
-                    "checkpointer",
-                    "autovacuum launcher",
-                    "walwriter",
-                    "parallel worker"
-                ],
-                answer: 1
-            },
-            {
-                question: "Какой тип индекса не может быть перестроен с помощью CREATE INDEX CONCURRENTLY?",
-                options: [
-                    "B-дерево",
-                    "GIN",
-                    "BRIN",
-                    "Хеш-индекс"
-                ],
-                answer: 3
-            },
-            {
-                question: "Что означает значение relfrozenxid в выводе команды VACUUM (verbose)?",
-                options: [
-                    "Номер последней транзакции, изменившей таблицу",
-                    "Номер транзакции, при которой строки были заморожены",
-                    "Размер карты свободного пространства",
-                    "Количество мертвых версий строк"
-                ],
-                answer: 1
-            },
-            {
-                question: "Какой механизм предотвращает переполнение 32-битного счетчика транзакций?",
-                options: [
-                    "WAL-журналирование",
-                    "Заморозка (freezing) старых версий строк",
-                    "Карта свободного пространства",
-                    "Рекомендательные блокировки"
-                ],
-                answer: 1
-            },
-            {
-                question: "Какой тип блокировки используется при выполнении VACUUM FULL?",
-                options: [
-                    "ACCESS SHARE",
-                    "ROW EXCLUSIVE",
-                    "SHARE",
-                    "ACCESS EXCLUSIVE"
-                ],
-                answer: 3
-            },
-            {
-                question: "Какое расширение позволяет выполнить перестроение таблицы без блокировки?",
-                options: [
-                    "pgstattuple",
-                    "pg_repack",
-                    "pg_trgm",
-                    "pgcrypto"
-                ],
-                answer: 1
-            },
-            {
-                question: "Что происходит с индексами B-дерева при удалении всех записей из страницы?",
-                options: [
-                    "Страница физически удаляется",
-                    "Страница помечается как свободная в карте FSM",
-                    "Страница остается в структуре индекса",
-                    "Страница перемещается в резервный файл"
-                ],
-                answer: 2
-            },
-            {
-                question: "Какой параметр отвечает за периодический запуск автоочистки?",
-                options: [
-                    "autovacuum_naptime",
-                    "checkpoint_segments",
-                    "maintenance_work_mem",
-                    "random_page_cost"
-                ],
-                answer: 0
-            },
-            {
-                question: "Какой уровень изоляции может увеличить число мертвых версий строк?",
-                options: [
-                    "Read Committed",
-                    "Repeatable Read",
-                    "Serializable",
-                    "Read Uncommitted"
-                ],
-                answer: 1
-            },
-            {
-                question: "Какой файл в PostgreSQL содержит информацию о статусе транзакций?",
-                options: [
-                    "pg_wal",
-                    "pg_xact",
-                    "pg_buffercache",
-                    "pg_clog"
-                ],
-                answer: 1,
-                comment: "Правильный ответ: pg_xact (ранее pg_clog)"
-            },
-            {
-                question: "Что показывает параметр tuple_percent в выводе pgstattuple?",
-                options: [
-                    "Процент актуальных данных в таблице",
-                    "Процент мертвых версий строк",
-                    "Процент свободного пространства",
-                    "Процент физического размера таблицы"
-                ],
-                answer: 0
-            },
-            {
-                question: "Какой тип индекса не поддерживает объединение страниц?",
-                options: [
-                    "B-дерево",
-                    "GIN",
-                    "BRIN",
-                    "GiST"
-                ],
-                answer: 0
-            },
-            {
-                question: "Что означает значение dead_tuple_count в выводе VACUUM?",
-                options: [
-                    "Количество активных транзакций",
-                    "Количество удаленных версий строк",
-                    "Количество физических страниц",
-                    "Количество индексов"
-                ],
-                answer: 1
-            },
-            {
-                question: "Какой параметр конфигурации регулирует минимальный порог разрастания таблицы для запуска автоочистки?",
-                options: [
-                    "autovacuum_vacuum_threshold",
-                    "autovacuum_analyze_threshold",
-                    "autovacuum_vacuum_scale_factor",
-                    "autovacuum_freeze_max_age"
-                ],
-                answer: 0
-            },
-            {
-                question: "Какой процесс в PostgreSQL отвечает за обновление карты свободного пространства (FSM)?",
-                options: [
-                    "bgwriter",
-                    "autovacuum",
-                    "checkpointer",
-                    "walreceiver"
-                ],
-                answer: 1
-            },
-            {
-                question: "Какой инструмент позволяет оценить эффективность индекса B-дерева?",
-                options: [
-                    "pg_stat_statements",
-                    "pgstattuple",
-                    "pgstatindex",
-                    "pg_prewarm"
-                ],
-                answer: 2
-            },
-            {
-                question: "Что происходит с таблицей после выполнения команды REINDEX CONCURRENTLY?",
-                options: [
-                    "Таблица блокируется на время выполнения",
-                    "Индекс временно становится недоступен",
-                    "Создается новый индекс и заменяет старый",
-                    "Индекс физически удаляется и создается заново"
-                ],
-                answer: 2
-            },
-            {
-                question: "Какой механизм помогает оптимизатору запросов выбрать эффективный план?",
-                options: [
-                    "MVCC",
-                    "Карта видимости",
-                    "WAL",
-                    "Карта свободного пространства"
-                ],
-                answer: 2
-            },
-            {
-                question: "Какой уровень изоляции может увеличить число мертвых версий строк?",
-                options: [
-                    "Read Committed",
-                    "Repeatable Read",
-                    "Serializable",
-                    "Read Uncommitted"
-                ],
-                answer: 1
-            },
-            {
-                question: "Какой параметр конфигурации отключает автоочистку для конкретной таблицы?",
-                options: [
-                    "autovacuum_enabled=off",
-                    "track_counts=off",
-                    "checkpoint_segments=0",
-                    "work_mem=1MB"
-                ],
-                answer: 0
-            },
-            {
-                question: "Какой процесс в PostgreSQL отвечает за обновление карты свободного пространства (FSM)?",
-                options: [
-                    "checkpointer",
-                    "bgwriter",
-                    "autovacuum",
-                    "walwriter"
-                ],
-                answer: 2
-            },
-            {
-                question: "Какой механизм позволяет использовать свободное пространство для новых строк?",
-                options: [
-                    "MVCC",
-                    "Карта свободного пространства (FSM)",
-                    "Карта видимости",
-                    "WAL-журналирование"
-                ],
-                answer: 1
-            },
-            {
-                question: "Что означает значение free_percent в выводе pgstattuple?",
-                options: [
-                    "Процент свободного места в таблице",
-                    "Процент мертвых версий строк",
-                    "Процент физического размера таблицы",
-                    "Процент использования индексов"
-                ],
-                answer: 0
-            },
-            {
-                question: "Какой процесс в PostgreSQL может вызывать ошибки 'deadlock_detected'?",
-                options: [
-                    "autovacuum",
-                    "checkpointer",
-                    "bgwriter",
-                    "walwriter"
-                ],
-                answer: 0
-            },
-            {
-                question: "Какой параметр конфигурации регулирует частоту запуска автоочистки?",
-                options: [
-                    "autovacuum_naptime",
-                    "autovacuum_vacuum_cost_delay",
-                    "autovacuum_max_workers",
-                    "autovacuum_vacuum_threshold"
-                ],
-                answer: 0
-            },
-            {
-                question: "Какой файл в PostgreSQL содержит информацию о замороженных транзакциях?",
-                options: [
-                    "pg_xact",
-                    "pg_wal",
-                    "pg_fsm",
-                    "pg_freeze"
-                ],
-                answer: 0
-            },
-            {
-                question: "Какой уровень изоляции может привести к разрастанию таблицы?",
-                options: [
-                    "Read Committed",
-                    "Repeatable Read",
-                    "Serializable",
-                    "Read Uncommitted"
-                ],
-                answer: 1
-            },
-            {
-                question: "Какой инструмент используется для перестроения таблицы без блокировки?",
-                options: [
-                    "VACUUM FULL",
-                    "REINDEX",
-                    "pg_repack",
-                    "ANALYZE"
-                ],
-                answer: 2
-            },
-            {
-                question: "Какой механизм предотвращает переполнение 32-битного счетчика транзакций?",
-                options: [
-                    "MVCC",
-                    "Заморозка (freezing)",
-                    "WAL",
-                    "Карта свободного пространства"
-                ],
-                answer: 1
-            },
-            {
-                question: "Какой тип индекса не поддерживает параллельное перестроение?",
-                options: [
-                    "B-дерево",
-                    "GIN",
-                    "BRIN",
-                    "Хеш-индекс"
-                ],
-                answer: 3
-            },
-            {
-                question: "Какой параметр конфигурации отвечает за максимальное число рабочих процессов автоочистки?",
-                options: [
-                    "autovacuum_max_workers",
-                    "max_worker_processes",
-                    "max_parallel_workers",
-                    "autovacuum_naptime"
-                ],
-                answer: 0
-            },
-            {
-                question: "Какой уровень изоляции может выдавать ошибки сериализации при очистке?",
-                options: [
-                    "Read Committed",
-                    "Repeatable Read",
-                    "Serializable",
-                    "Read Uncommitted"
-                ],
-                answer: 2
-            },
-            {
-                question: "Какой процесс в PostgreSQL отвечает за обновление карты свободного пространства (FSM)?",
-                options: [
-                    "checkpointer",
-                    "bgwriter",
-                    "autovacuum",
-                    "walwriter"
-                ],
-                answer: 2
-            },
-            {
-                question: "Какой параметр конфигурации регулирует минимальное число изменений, требующих запуска автоочистки?",
-                options: [
-                    "autovacuum_vacuum_threshold",
-                    "autovacuum_analyze_threshold",
-                    "autovacuum_vacuum_scale_factor",
-                    "autovacuum_freeze_max_age"
-                ],
-                answer: 0
-            },
-
-            {
-                question: "Какой уровень изоляции может привести к фантомному чтению при очистке?",
-                options: [
-                    "Read Committed",
-                    "Repeatable Read",
-                    "Serializable",
-                    "Read Uncommitted"
-                ],
-                answer: 1
-            },
-            {
-                question: "Какой процесс в PostgreSQL может блокировать таблицу на время выполнения?",
-                options: [
-                    "autovacuum",
-                    "bgwriter",
-                    "checkpointer",
-                    "VACUUM FULL"
-                ],
-                answer: 3
-            },
-            {
-                question: "Какой параметр конфигурации регулирует частоту обновления карты свободного пространства (FSM)?",
-                options: [
-                    "autovacuum_vacuum_cost_delay",
-                    "autovacuum_naptime",
-                    "autovacuum_vacuum_threshold",
-                    "autovacuum_freeze_max_age"
-                ],
-                answer: 0
-            },
-            {
-                question: "Какой механизм в PostgreSQL используется для ускорения индексного доступа?",
-                options: [
-                    "MVCC",
-                    "Карта видимости",
-                    "WAL",
-                    "Карта свободного пространства"
-                ],
-                answer: 1
-            },
-            {
-                question: "Какой параметр конфигурации регулирует порог заморозки транзакций?",
-                options: [
-                    "autovacuum_vacuum_threshold",
-                    "autovacuum_freeze_max_age",
-                    "autovacuum_analyze_threshold",
-                    "autovacuum_vacuum_scale_factor"
-                ],
-                answer: 1
-            },
-            {
-                question: "Какой уровень изоляции может увеличить число мертвых версий строк?",
-                options: [
-                    "Read Committed",
-                    "Repeatable Read",
-                    "Serializable",
-                    "Read Uncommitted"
-                ],
-                answer: 1
-            },
-            {
-                question: "Какой параметр конфигурации регулирует максимальное число одновременных рабочих процессов автоочистки?",
-                options: [
-                    "autovacuum_max_workers",
-                    "max_worker_processes",
-                    "max_connections",
-                    "max_parallel_workers"
-                ],
-                answer: 0
-            },
-            {
-                question: "Какой файл в PostgreSQL содержит информацию о замороженных транзакциях?",
-                options: [
-                    "pg_xact",
-                    "pg_freeze",
-                    "pg_clog",
-                    "pg_wal"
-                ],
-                answer: 0
-            },
-            {
-                question: "Какой уровень изоляции может привести к разрастанию таблицы?",
-                options: [
-                    "Read Committed",
-                    "Repeatable Read",
-                    "Serializable",
-                    "Read Uncommitted"
-                ],
-                answer: 1
-            },
-            {
-                question: "Какой процесс в PostgreSQL может блокировать таблицу на время выполнения?",
-                options: [
-                    "autovacuum",
-                    "VACUUM FULL",
-                    "bgwriter",
-                    "checkpointer"
-                ],
-                answer: 1
-            },
-            {
-                question: "Какой параметр конфигурации регулирует порог активности таблицы для запуска автоочистки?",
-                options: [
-                    "autovacuum_vacuum_threshold",
-                    "autovacuum_analyze_threshold",
-                    "autovacuum_vacuum_scale_factor",
-                    "autovacuum_freeze_max_age"
-                ],
-                answer: 0
-            },
-            {
-                question: "Какой механизм в PostgreSQL используется для ускорения индексного доступа?",
-                options: [
-                    "MVCC",
-                    "Карта видимости",
-                    "WAL",
-                    "Карта свободного пространства"
-                ],
-                answer: 1
-            },
-            {
-                question: "Какой параметр конфигурации регулирует максимальный возраст транзакции для заморозки?",
-                options: [
-                    "autovacuum_vacuum_threshold",
-                    "autovacuum_freeze_max_age",
-                    "autovacuum_analyze_threshold",
-                    "autovacuum_vacuum_scale_factor"
-                ],
-                answer: 1
-            },
-            {
-                question: "Какой уровень изоляции может увеличить число мертвых версий строк?",
-                options: [
-                    "Read Committed",
-                    "Repeatable Read",
-                    "Serializable",
-                    "Read Uncommitted"
-                ],
-                answer: 1
-            },
-            {
-                question: "Какой процесс в PostgreSQL отвечает за обновление карты свободного пространства (FSM)?",
-                options: [
-                    "autovacuum",
-                    "bgwriter",
-                    "checkpointer",
-                    "walreceiver"
-                ],
-                answer: 0
-            },
-            {
-                question: "Какой параметр конфигурации регулирует долю изменений, требующих запуска автоочистки?",
-                options: [
-                    "autovacuum_vacuum_threshold",
-                    "autovacuum_analyze_threshold",
-                    "autovacuum_vacuum_scale_factor",
-                    "autovacuum_freeze_max_age"
-                ],
-                answer: 2
-            },
-            {
-                question: "Какой файл в PostgreSQL содержит информацию о статусе транзакций?",
-                options: [
-                    "pg_clog",
-                    "pg_xact",
-                    "pg_wal",
-                    "pg_fsm"
-                ],
-                answer: 0
-            },
-            {
-                question: "Какой уровень изоляции может выдавать ошибки сериализации при очистке?",
-                options: [
-                    "Read Committed",
-                    "Repeatable Read",
-                    "Serializable",
-                    "Read Uncommitted"
-                ],
-                answer: 2
-            },
-            {
-                question: "Какой параметр конфигурации регулирует минимальное число изменений, требующих запуска автоочистки?",
-                options: [
-                    "autovacuum_vacuum_threshold",
-                    "autovacuum_analyze_threshold",
-                    "autovacuum_vacuum_scale_factor",
-                    "autovacuum_freeze_max_age"
-                ],
-                answer: 0
-            },
-            {
-                question: "Какой механизм в PostgreSQL используется для ускорения индексного доступа?",
-                options: [
-                    "MVCC",
-                    "Карта свободного пространства",
-                    "Карта видимости",
-                    "WAL"
-                ],
-                answer: 2
-            },
-            {
-                question: "Какой параметр конфигурации регулирует максимальный возраст транзакции для заморозки?",
-                options: [
-                    "autovacuum_vacuum_threshold",
-                    "autovacuum_freeze_max_age",
-                    "autovacuum_analyze_threshold",
-                    "autovacuum_vacuum_scale_factor"
-                ],
-                answer: 1
-            },
-            {
-                question: "Какой уровень изоляции может увеличить число мертвых версий строк?",
-                options: [
-                    "Read Committed",
-                    "Serializable",
-                    "Repeatable Read",
-                    "Read Uncommitted"
-                ],
-                answer: 2
-            },
-            {
-                question: "Какой процесс в PostgreSQL может вызывать ошибки 'deadlock_detected'?",
-                options: [
-                    "autovacuum",
-                    "bgwriter",
-                    "checkpointer",
-                    "walwriter"
-                ],
-                answer: 0
-            },
-            {
-                question: "Какой параметр конфигурации регулирует частоту запуска автоочистки?",
-                options: [
-                    "autovacuum_naptime",
-                    "autovacuum_vacuum_cost_delay",
-                    "autovacuum_vacuum_threshold",
-                    "autovacuum_freeze_max_age"
-                ],
-                answer: 0
-            },
-            {
-                question: "Какой файл в PostgreSQL содержит информацию о статусе транзакций?",
-                options: [
-                    "pg_clog",
-                    "pg_xact",
-                    "pg_wal",
-                    "pg_fsm"
-                ],
-                answer: 0
-            },
-            {
-                question: "Какой уровень изоляции может привести к фантомному чтению при очистке?",
-                options: [
-                    "Read Committed",
-                    "Serializable",
-                    "Repeatable Read",
-                    "Read Uncommitted"
-                ],
-                answer: 2
-            },
-            {
-                question: "Какой процесс в PostgreSQL отвечает за обновление карты свободного пространства (FSM)?",
-                options: [
-                    "autovacuum",
-                    "bgwriter",
-                    "checkpointer",
-                    "walreceiver"
-                ],
-                answer: 0
-            },
-            {
-                question: "Какой параметр конфигурации регулирует порог активности таблицы для запуска автоочистки?",
-                options: [
-                    "autovacuum_vacuum_threshold",
-                    "autovacuum_analyze_threshold",
-                    "autovacuum_vacuum_scale_factor",
-                    "autovacuum_freeze_max_age"
-                ],
-                answer: 0
-            },
-            {
-                question: "Какой файл в PostgreSQL содержит информацию о замороженных транзакциях?",
-                options: [
-                    "pg_freeze",
-                    "pg_xact",
-                    "pg_clog",
-                    "pg_wal"
-                ],
-                answer: 1
-            },
-            {
-                question: "Какой уровень изоляции может выдавать ошибки сериализации при очистке?",
-                options: [
-                    "Read Committed",
-                    "Repeatable Read",
-                    "Serializable",
-                    "Read Uncommitted"
-                ],
-                answer: 2
-            },
-            {
-                question: "Какой параметр конфигурации регулирует порог активности таблицы для запуска автоочистки?",
-                options: [
-                    "autovacuum_vacuum_threshold",
-                    "autovacuum_analyze_threshold",
-                    "autovacuum_vacuum_scale_factor",
-                    "autovacuum_freeze_max_age"
-                ],
-                answer: 0
-            },
-            {
-                question: "Какой файл в PostgreSQL содержит информацию о статусе транзакций?",
-                options: [
-                    "pg_clog",
-                    "pg_xact",
-                    "pg_wal",
-                    "pg_fsm"
-                ],
-                answer: 0
-            },
-            {
-                question: "Какой уровень изоляции может привести к разрастанию таблицы?",
-                options: [
-                    "Read Committed",
-                    "Serializable",
-                    "Repeatable Read",
-                    "Read Uncommitted"
-                ],
-                answer: 2
-            },
-            {
-                question: "Какой процесс в PostgreSQL может блокировать таблицу на время выполнения?",
-                options: [
-                    "autovacuum",
-                    "VACUUM FULL",
-                    "bgwriter",
-                    "checkpointer"
-                ],
-                answer: 1
-            },
-            {
-                question: "Какой параметр конфигурации регулирует порог активности таблицы для запуска автоочистки?",
-                options: [
-                    "autovacuum_vacuum_threshold",
-                    "autovacuum_analyze_threshold",
-                    "autovacuum_vacuum_scale_factor",
-                    "autovacuum_freeze_max_age"
-                ],
-                answer: 0
-            },
-            {
-                question: "Какой файл в PostgreSQL содержит информацию о замороженных транзакциях?",
-                options: [
-                    "pg_freeze",
-                    "pg_xact",
-                    "pg_clog",
-                    "pg_wal"
-                ],
-                answer: 1
-            },
-            {
-                question: "Какой уровень изоляции может выдавать ошибки сериализации при очистке?",
-                options: [
-                    "Read Committed",
-                    "Repeatable Read",
-                    "Serializable",
-                    "Read Uncommitted"
-                ],
-                answer: 2
-            },
-            {
-                question: "Какой параметр конфигурации регулирует порог активности таблицы для запуска автоочистки?",
-                options: [
-                    "autovacuum_vacuum_threshold",
-                    "autovacuum_analyze_threshold",
-                    "autovacuum_vacuum_scale_factor",
-                    "autovacuum_freeze_max_age"
-                ],
-                answer: 0
-            },
-            {
-                question: "Какой файл в PostgreSQL содержит информацию о статусе транзакций?",
-                options: [
-                    "pg_clog",
-                    "pg_xact",
-                    "pg_wal",
-                    "pg_fsm"
-                ],
-                answer: 0
-            },
-            {
-                question: "Какой уровень изоляции может увеличить число мертвых версий строк?",
-                options: [
-                    "Read Committed",
-                    "Serializable",
-                    "Repeatable Read",
-                    "Read Uncommitted"
-                ],
-                answer: 2
-            },
-            {
-                question: "Какой процесс в PostgreSQL может вызывать ошибки 'deadlock_detected'?",
-                options: [
-                    "autovacuum",
-                    "bgwriter",
-                    "checkpointer",
-                    "walreceiver"
-                ],
-                answer: 0
-            },
-            {
-                question: "Какой параметр конфигурации регулирует частоту запуска автоочистки?",
-                options: [
-                    "autovacuum_naptime",
-                    "autovacuum_vacuum_cost_delay",
-                    "autovacuum_vacuum_threshold",
-                    "autovacuum_freeze_max_age"
-                ],
-                answer: 0
-            },
-            {
-                question: "Какой файл в PostgreSQL содержит информацию о замороженных транзакциях?",
-                options: [
-                    "pg_freeze",
-                    "pg_xact",
-                    "pg_clog",
-                    "pg_wal"
-                ],
-                answer: 1
-            },
-            {
-                question: "Какой уровень изоляции может выдавать ошибки сериализации при очистке?",
-                options: [
-                    "Read Committed",
-                    "Repeatable Read",
-                    "Serializable",
-                    "Read Uncommitted"
-                ],
-                answer: 2
-            },
-            {
-                question: "Какой процесс в PostgreSQL отвечает за обновление статистики таблицы?",
-                options: [
-                    "autovacuum worker",
-                    "checkpointer",
-                    "bgwriter",
-                    "walreceiver"
-                ],
-                answer: 0
-            },
-            {
-                question: "Какой параметр конфигурации регулирует порог активности таблицы для запуска автоочистки?",
-                options: [
-                    "autovacuum_vacuum_threshold",
-                    "autovacuum_analyze_threshold",
-                    "autovacuum_vacuum_scale_factor",
-                    "autovacuum_freeze_max_age"
-                ],
-                answer: 0
-            },
-            {
-                question: "Какой файл в PostgreSQL содержит информацию о статусе транзакций?",
-                options: [
-                    "pg_clog",
-                    "pg_xact",
-                    "pg_wal",
-                    "pg_fsm"
-                ],
-                answer: 0
-            },
-            {
-                question: "Какой уровень изоляции может привести к разрастанию таблицы?",
-                options: [
-                    "Read Committed",
-                    "Serializable",
-                    "Repeatable Read",
-                    "Read Uncommitted"
-                ],
-                answer: 2
-            },
-            {
-                question: "Какой процесс в PostgreSQL может блокировать таблицу на время выполнения?",
-                options: [
-                    "autovacuum",
-                    "VACUUM FULL",
-                    "bgwriter",
-                    "checkpointer"
-                ],
-                answer: 1
-            },
-            {
-                question: "Что происходит с индексами B-дерева при удалении всех записей с их страниц?",
-                options: [
-                    "Страницы физически удаляются",
-                    "Страницы остаются в структуре индекса",
-                    "Страницы перемещаются в pg_wal",
-                    "Страницы объединяются с соседними"
-                ],
-                answer: 1
-            },
-            {
-                question: "Какой параметр конфигурации регулирует порог активности для анализа таблицы?",
-                options: [
-                    "autovacuum_vacuum_threshold",
-                    "autovacuum_analyze_threshold",
-                    "autovacuum_vacuum_scale_factor",
-                    "autovacuum_analyze_scale_factor"
-                ],
-                answer: 1
-            },
-            {
-                question: "Какой файл системного каталога содержит информацию о замороженных мультитранзакциях?",
-                options: [
-                    "pg_xact",
-                    "pg_multixact",
-                    "pg_clog",
-                    "pg_fsm"
-                ],
-                answer: 1
-            },
-            {
-                question: "Почему использование TRUNCATE предпочтительнее DELETE + VACUUM для очистки таблицы?",
-                options: [
-                    "TRUNCATE быстрее выполняется",
-                    "TRUNCATE не требует освобождения пространства через VACUUM",
-                    "TRUNCATE поддерживает MVCC",
-                    "TRUNCATE работает только для пустых таблиц"
-                ],
-                answer: 1
-            },
-            {
-                question: "Какой параметр конфигурации регулирует максимальный возраст мультитранзакций перед заморозкой?",
-                options: [
-                    "autovacuum_freeze_max_age",
-                    "autovacuum_multixact_freeze_max_age",
-                    "vacuum_freeze_table_age",
-                    "vacuum_multixact_freeze_table_age"
-                ],
-                answer: 1
-            },
-            {
-                question: "Какой процесс в PostgreSQL отвечает за обновление карты видимости (visibility map)?",
-                options: [
-                    "bgwriter",
-                    "checkpointer",
-                    "autovacuum",
-                    "walreceiver"
-                ],
-                answer: 2
-            },
-            {
-                question: "Почему автоочистка может не успевать завершаться при частых блокировках SHARE UPDATE EXCLUSIVE?",
-                options: [
-                    "Из-за ограничения на количество рабочих процессов",
-                    "Из-за конфликтов блокировок с другими командами",
-                    "Из-за высокой нагрузки на диск",
-                    "Из-за настроек track_counts"
-                ],
-                answer: 1
-            },
-            {
-                question: "Какой инструмент позволяет выполнить перестроение таблицы без блокировки на уровне ACCESS EXCLUSIVE?",
-                options: [
-                    "VACUUM FULL",
-                    "pg_repack",
-                    "REINDEX",
-                    "CLUSTER"
-                ],
-                answer: 1
-            },
-            {
-                question: "Какой уровень изоляции может вызывать ошибки сериализации при обновлении карты свободного пространства?",
-                options: [
-                    "Read Committed",
-                    "Repeatable Read",
-                    "Serializable",
-                    "Read Uncommitted"
-                ],
-                answer: 2
-            },
-            {
-                question: "Какое значение relfrozenxid указывает на необходимость срочной заморозки строк?",
-                options: [
-                    "Когда relfrozenxid старше vacuum_freeze_table_age",
-                    "Когда relfrozenxid равен 0",
-                    "Когда relfrozenxid младше autovacuum_freeze_min_age",
-                    "Когда relfrozenxid используется в системном каталоге"
-                ],
-                answer: 0
-            },
-            {
-                question: "Что происходит со статистикой, если таблица, подвергнутая ANALYZE, пустая?",
-                options: [
-                    "Статистика устанавливается в ноль",
-                    "Статистика не обновляется",
-                    "Статистика заполняется значениями по умолчанию",
-                    "Статистика удаляется из pg_statistic"
-                ],
-                answer: 1
-            },
-            {
-                question: "Какой параметр команды ANALYZE позволяет пропустить таблицы с конфликтующими блокировками?",
-                options: [
-                    "BUFFER_USAGE_LIMIT",
-                    "SKIP_LOCKED",
-                    "VERBOSE",
-                    "default_statistics_target"
-                ],
-                answer: 1
-            },
-            {
-                question: "Какой параметр управляет объемом буфера стратегии доступа к страницам при выполнении ANALYZE?",
-                options: [
-                    "vacuum_buffer_usage_limit",
-                    "BUFFER_USAGE_LIMIT",
-                    "work_mem",
-                    "maintenance_work_mem"
-                ],
-                answer: 1
-            },
-            {
-                question: "Что означает установка значения STATISTICS = 0 для столбца таблицы?",
-                options: [
-                    "Столбец будет проиндексирован",
-                    "Статистика по столбцу не собирается",
-                    "Статистика будет собираться с максимальной точностью",
-                    "Столбец будет заморожен"
-                ],
-                answer: 1
-            },
-            {
-                question: "Как ANALYZE обрабатывает секционированные таблицы при отсутствии указания конкретных столбцов?",
-                options: [
-                    "Анализирует только родительскую таблицу",
-                    "Анализирует все секции рекурсивно",
-                    "Пропускает секции из-за ограничений наследования",
-                    "Анализирует только одну секцию"
-                ],
-                answer: 1
-            },
-            {
-                question: "Какой уровень изоляции может повлиять на точность статистики, собираемой ANALYZE?",
-                options: [
-                    "Read Committed",
-                    "Serializable",
-                    "Не влияет никакой",
-                    "Repeatable Read"
-                ],
-                answer: 2
-            },
-            {
-                question: "Какой файл системного каталога хранит статистику, собранную командой ANALYZE?",
-                options: [
-                    "pg_statistic",
-                    "pg_clog",
-                    "pg_xact",
-                    "pg_fsm"
-                ],
-                answer: 0
-            },
-            {
-                question: "Что происходит с оценкой числа уникальных значений (n_distinct) при анализе таблицы?",
-                options: [
-                    "Всегда точная",
-                    "Приблизительная, на основе случайной выборки",
-                    "Зависит от уровня изоляции",
-                    "Фиксируется в WAL-журнале"
-                ],
-                answer: 1
-            },
-            {
-                question: "Как можно улучшить точность статистики для конкретного столбца?",
-                options: [
-                    "Увеличить значение STATISTICS",
-                    "Установить SKIP_LOCKED",
-                    "Включить VERBOSE",
-                    "Использовать TRUNCATE"
-                ],
-                answer: 0
-            },
-            {
-                question: "Какой параметр влияет на объем выборки при сборе статистики для таблицы?",
-                options: [
-                    "default_statistics_target",
-                    "autovacuum_vacuum_threshold",
-                    "track_counts",
-                    "random_page_cost"
-                ],
-                answer: 0
-            },
-            {
-                question: "Какой уровень привилегий требуется для выполнения ANALYZE?",
-                options: [
-                    "Только суперпользователь",
-                    "Владелец таблицы или суперпользователь",
-                    "Любой пользователь",
-                    "Администратор базы данных"
-                ],
-                answer: 1
-            },
-            {
-                question: "Как ANALYZE обрабатывает таблицы наследования?",
-                options: [
-                    "Собирает статистику только для родительской таблицы",
-                    "Собирает два набора статистики: для родителя и потомков",
-                    "Пропускает наследуемые таблицы",
-                    "Создает новую таблицу для наследования"
-                ],
-                answer: 1
-            },
-            {
-                question: "Какой параметр позволяет отключить использование буферной стратегии при анализе?",
-                options: [
-                    "BUFFER_USAGE_LIMIT = 0",
-                    "SKIP_LOCKED = true",
-                    "VERBOSE = off",
-                    "STATISTICS = 0"
-                ],
-                answer: 0
-            },
-            {
-                question: "Какой механизм используется для обновления статистики в материализованных представлениях?",
-                options: [
-                    "Только VACUUM FULL",
-                    "ANALYZE",
-                    "REINDEX",
-                    "CLUSTER"
-                ],
-                answer: 1
-            },
-            {
-                question: "Какой параметр определяет максимальное число интервалов гистограммы для столбца?",
-                options: [
-                    "default_statistics_target",
-                    "autovacuum_analyze_threshold",
-                    "track_counts",
-                    "vacuum_freeze_min_age"
-                ],
-                answer: 0
-            },
-            {
-                question: "Как ANALYZE обрабатывает сторонние таблицы без поддержки команды?",
-                options: [
-                    "Выдает ошибку",
-                    "Пропускает с предупреждением",
-                    "Пытается использовать локальный кеш",
-                    "Физически удаляет таблицу"
-                ],
-                answer: 1
-            },
-            {
-                question: "Какой уровень изоляции может привести к неточной статистике при частых изменениях данных?",
-                options: [
-                    "Read Committed",
-                    "Repeatable Read",
-                    "Serializable",
-                    "Read Uncommitted"
-                ],
-                answer: 0
-            },
-            {
-                question: "Какой процесс в PostgreSQL автоматически запускает ANALYZE?",
-                options: [
-                    "autovacuum",
-                    "bgwriter",
-                    "checkpointer",
-                    "walwriter"
-                ],
-                answer: 0
-            },
-            {
-                question: "Как ANALYZE влияет на EXPLAIN при оценке планов выполнения?",
-                options: [
-                    "Не влияет, так как EXPLAIN не использует статистику",
-                    "Улучшает точность оценок стоимости и времени выполнения",
-                    "Замедляет выполнение EXPLAIN",
-                    "Удаляет устаревшие планы из кеша"
-                ],
-                answer: 1
-            },
-            {
-                question: "Какой уровень блокировки устанавливает ANALYZE на таблицу?",
-                options: [
-                    "ACCESS EXCLUSIVE",
-                    "SHARE UPDATE EXCLUSIVE",
-                    "READ ONLY",
-                    "ROW EXCLUSIVE"
-                ],
-                answer: 2
-            },
-            {
-                question: "Как можно обновить статистику только для определенных столбцов таблицы?",
-                options: [
-                    "ANALYZE table_name(column1, column2)",
-                    "ANALYZE table_name SET (column1, column2)",
-                    "ANALYZE VERBOSE",
-                    "ANALYZE только для всей таблицы"
-                ],
-                answer: 0
-            },
-            {
-                question: "Что означает параметр BUFFER_USAGE_LIMIT = 0?",
-                options: [
-                    "Буферная стратегия отключена",
-                    "Буферная стратегия включена",
-                    "Буферная стратегия заморожена",
-                    "Буферная стратегия игнорируется"
-                ],
-                answer: 0
-            },
-            {
-                question: "Какой параметр позволяет управлять объемом статистики на уровне столбцов?",
-                options: [
-                    "default_statistics_target",
-                    "autovacuum_vacuum_threshold",
-                    "track_counts",
-                    "random_page_cost"
-                ],
-                answer: 0
-            },
-            {
-                question: "Какой механизм в PostgreSQL предотвращает переполнение 32-битного счетчика транзакций?",
-                options: [
-                    "WAL-журналирование",
-                    "Заморозка (freezing) старых версий строк",
-                    "Карта свободного пространства (FSM)",
-                    "Рекомендательные блокировки"
-                ],
-                answer: 1
-            },
-            {
-                question: "Какой параметр конфигурации определяет минимальный возраст транзакции для заморозки строк?",
-                options: [
-                    "autovacuum_freeze_max_age",
-                    "vacuum_freeze_min_age",
-                    "track_counts",
-                    "maintenance_work_mem"
-                ],
-                answer: 1
-            },
-            {
-                question: "Какой процесс в PostgreSQL обновляет карту видимости (visibility map) при очистке таблицы?",
-                options: [
-                    "bgwriter",
-                    "autovacuum",
-                    "checkpointer",
-                    "walreceiver"
-                ],
-                answer: 1
-            },
-            {
-                question: "Что происходит с таблицей при выполнении команды VACUUM FULL?",
-                options: [
-                    "Старые версии строк удаляются без изменения физического размера",
-                    "Таблица полностью перезаписывается, освобождая место на диске",
-                    "Обновляется только статистика таблицы",
-                    "Таблица блокируется только на чтение"
-                ],
-                answer: 1
-            },
-            {
-                question: "Какое расширение позволяет перестроить таблицу без блокировки на уровне ACCESS EXCLUSIVE?",
-                options: [
-                    "pg_repack",
-                    "pgstattuple",
-                    "pg_trgm",
-                    "pgcrypto"
-                ],
-                answer: 0
-            },
-            {
-                question: "Какой тип индекса не поддерживает неблокирующее перестроение (REINDEX CONCURRENTLY)?",
-                options: [
-                    "B-дерево",
-                    "GIN",
-                    "BRIN",
-                    "Системные индексы"
-                ],
-                answer: 3
-            },
-            {
-                question: "Какой параметр конфигурации регулирует порог активности таблицы для запуска автоочистки?",
-                options: [
-                    "autovacuum_vacuum_threshold",
-                    "autovacuum_analyze_threshold",
-                    "vacuum_freeze_min_age",
-                    "track_counts"
-                ],
-                answer: 0
-            },
-            {
-                question: "Какой файл системного каталога содержит информацию о замороженных мультитранзакциях?",
-                options: [
-                    "pg_xact",
-                    "pg_multixact",
-                    "pg_clog",
-                    "pg_fsm"
-                ],
-                answer: 1
-            },
-            {
-                question: "Почему команда TRUNCATE предпочтительнее DELETE + VACUUM для очистки таблицы?",
-                options: [
-                    "TRUNCATE не требует обновления карты видимости",
-                    "TRUNCATE не оставляет мертвых версий строк",
-                    "TRUNCATE работает быстрее за счет параллельных процессов",
-                    "TRUNCATE не использует WAL-журнал"
-                ],
-                answer: 1
-            },
-            {
-                question: "Какой параметр управляет максимальным возрастом мультитранзакций перед заморозкой?",
-                options: [
-                    "autovacuum_freeze_max_age",
-                    "autovacuum_multixact_freeze_max_age",
-                    "vacuum_multixact_freeze_table_age",
-                    "vacuum_freeze_table_age"
-                ],
-                answer: 1
-            },
-            {
-                question: "Какой уровень блокировки устанавливается при выполнении REINDEX?",
-                options: [
-                    "ACCESS SHARE",
-                    "ROW EXCLUSIVE",
-                    "SHARE",
-                    "ACCESS EXCLUSIVE"
-                ],
-                answer: 3
-            },
-            {
-                question: "Какой процесс в PostgreSQL может вызывать ошибки 'deadlock_detected'?",
-                options: [
-                    "autovacuum",
-                    "REINDEX",
-                    "VACUUM FULL",
-                    "ANALYZE"
-                ],
-                answer: 2
-            },
-            {
-                question: "Что означает значение relfrozenxid в выводе команды VACUUM (verbose)?",
-                options: [
-                    "Номер последней транзакции, изменившей таблицу",
-                    "Номер транзакции, при которой строки были заморожены",
-                    "Количество мертвых версий строк",
-                    "Размер карты свободного пространства"
-                ],
-                answer: 1
-            },
-            {
-                question: "Какой параметр конфигурации регулирует долю изменений, требующих запуска автоочистки?",
-                options: [
-                    "autovacuum_vacuum_threshold",
-                    "autovacuum_vacuum_scale_factor",
-                    "track_counts",
-                    "random_page_cost"
-                ],
-                answer: 1
-            },
-            {
-                question: "Какой файл в PostgreSQL содержит информацию о статусе транзакций?",
-                options: [
-                    "pg_clog",
-                    "pg_xact",
-                    "pg_wal",
-                    "pg_fsm"
-                ],
-                answer: 0
-            },
-            {
-                question: "Какой уровень изоляции может привести к фантомному чтению при обновлении статистики через ANALYZE?",
-                options: [
-                    "Read Committed",
-                    "Serializable",
-                    "Repeatable Read",
-                    "Read Uncommitted"
-                ],
-                answer: 2
-            },
-            {
-                question: "Какой процесс в PostgreSQL отвечает за обновление карты свободного пространства (FSM)?",
-                options: [
-                    "bgwriter",
-                    "checkpointer",
-                    "autovacuum",
-                    "walwriter"
-                ],
-                answer: 2
-            },
-            {
-                question: "Какой параметр конфигурации отключает автоочистку для конкретной таблицы?",
-                options: [
-                    "autovacuum_enabled=off",
-                    "track_counts=off",
-                    "checkpoint_segments=0",
-                    "work_mem=1MB"
-                ],
-                answer: 0
-            },
-            {
-                question: "Какой механизм в PostgreSQL используется для ускорения индексного доступа при очистке?",
-                options: [
-                    "MVCC",
-                    "Карта свободного пространства",
-                    "Карта видимости",
-                    "WAL-журналирование"
-                ],
-                answer: 2
-            },
-            {
-                question: "Какой уровень изоляции может выдавать ошибки сериализации при обновлении карты свободного пространства?",
-                options: [
-                    "Read Committed",
-                    "Repeatable Read",
-                    "Serializable",
-                    "Read Uncommitted"
-                ],
-                answer: 2
-            },
-            {
-                question: "Что показывает параметр tuple_percent в выводе pgstattuple?",
-                options: [
-                    "Процент мертвых версий строк",
-                    "Процент актуальных данных в таблице",
-                    "Процент свободного места в таблице",
-                    "Процент физического размера таблицы"
-                ],
-                answer: 1
-            },
-            {
-                question: "Какой параметр конфигурации регулирует объем буфера стратегии доступа к страницам при анализе?",
-                options: [
-                    "vacuum_buffer_usage_limit",
-                    "BUFFER_USAGE_LIMIT",
-                    "work_mem",
-                    "maintenance_work_mem"
-                ],
-                answer: 1
-            },
-            {
-                question: "Какой процесс в PostgreSQL может блокировать таблицу на время выполнения REINDEX CONCURRENTLY?",
-                options: [
-                    "bgwriter",
-                    "checkpointer",
-                    "autovacuum",
-                    "REINDEX CONCURRENTLY не блокирует таблицу"
-                ],
-                answer: 3
-            },
-            {
-                question: "Какой уровень изоляции может увеличить число мертвых версий строк при частом выполнении SELECT FOR UPDATE?",
-                options: [
-                    "Read Committed",
-                    "Repeatable Read",
-                    "Serializable",
-                    "Read Uncommitted"
-                ],
-                answer: 1
+                "question": "Какой процесс в PostgreSQL отвечает за автоматическую очистку таблиц?",
+                "options": ["pgBouncer", "autovacuum worker", "pg_repack", "bgwriter"],
+                "answer": 1
+            },
+            {
+                "question": "Что делает команда VACUUM FULL?",
+                "options": ["Обновляет статистику без изменения данных", "Полностью перезаписывает таблицу и индексы", "Блокирует таблицу и удаляет все мертвые версии строк", "Перестраивает индексы без блокировки таблицы"],
+                "answer": 1
+            },
+            {
+                "question": "Какая из перечисленных задач НЕ относится к функциям VACUUM?",
+                "options": ["Обновление карты свободного пространства", "Сбор статистики для оптимизатора", "Физическое удаление мертвых версий строк", "Перераспределение данных между страницами"],
+                "answer": 3
+            },
+            {
+                "question": "Что отслеживает карта свободного пространства (FSM)?",
+                "options": ["Статусы транзакций", "Объем свободного места для вставки новых данных", "Изменения в системном каталоге", "Активные блокировки на уровне страницы"],
+                "answer": 1
+            },
+            {
+                "question": "Какой инструмент позволяет оценить разрастание таблиц и индексов?",
+                "options": ["pg_stat_statements", "pgstattuple", "pg_waldump", "pg_repack"],
+                "answer": 1
+            },
+            {
+                "question": "Какой параметр конфигурации влияет на работу автоочистки?",
+                "options": ["work_mem", "shared_buffers", "track_counts", "random_page_cost"],
+                "answer": 2
+            },
+            {
+                "question": "Что происходит с освобожденным местом после выполнения обычного VACUUM?",
+                "options": ["Место возвращается операционной системе", "Место удаляется из файла таблицы", "Место остается в файле для новых данных", "Место шифруется для безопасности"],
+                "answer": 2
+            },
+            {
+                "question": "Какой тип индекса не может быть перестроен с помощью CREATE INDEX CONCURRENTLY?",
+                "options": ["B-дерево", "GIN", "BRIN", "Хеш-индекс"],
+                "answer": 3
+            },
+            {
+                "question": "Что означает значение relfrozenxid в выводе команды VACUUM (verbose)?",
+                "options": ["Номер последней транзакции, изменившей таблицу", "Номер транзакции, при которой строки были заморожены", "Размер карты свободного пространства", "Количество мертвых версий строк"],
+                "answer": 1
+            },
+            {
+                "question": "Что происходит с индексами B-дерева при удалении всех записей из страницы?",
+                "options": ["Страница физически удаляется", "Страница помечается как свободная в карте FSM", "Страница остается в структуре индекса", "Страница перемещается в резервный файл"],
+                "answer": 2
+            },
+            {
+                "question": "Какой параметр отвечает за периодический запуск автоочистки?",
+                "options": ["autovacuum_naptime", "checkpoint_segments", "maintenance_work_mem", "random_page_cost"],
+                "answer": 0
+            },
+            {
+                "question": "Какой уровень изоляции может увеличить число мертвых версий строк?",
+                "options": ["Read Committed", "Repeatable Read", "Serializable", "Read Uncommitted"],
+                "answer": 1
+            },
+            {
+                "question": "Что показывает параметр tuple_percent в выводе pgstattuple?",
+                "options": ["Процент актуальных данных в таблице", "Процент мертвых версий строк", "Процент свободного пространства", "Процент физического размера таблицы"],
+                "answer": 0
+            },
+            {
+                "question": "Что означает значение dead_tuple_count в выводе VACUUM?",
+                "options": ["Количество активных транзакций", "Количество удаленных версий строк", "Количество физических страниц", "Количество индексов"],
+                "answer": 1
+            },
+            {
+                "question": "Какой параметр конфигурации регулирует минимальный порог разрастания таблицы для запуска автоочистки?",
+                "options": ["autovacuum_vacuum_threshold", "autovacuum_analyze_threshold", "autovacuum_vacuum_scale_factor", "autovacuum_freeze_max_age"],
+                "answer": 0
+            },
+            {
+                "question": "Какой инструмент позволяет оценить эффективность индекса B-дерева?",
+                "options": ["pg_stat_statements", "pgstattuple", "pgstatindex", "pg_prewarm"],
+                "answer": 2
+            },
+            {
+                "question": "Что происходит с таблицей после выполнения команды REINDEX CONCURRENTLY?",
+                "options": ["Таблица блокируется на время выполнения", "Индекс временно становится недоступен", "Создается новый индекс и заменяет старый", "Индекс физически удаляется и создается заново"],
+                "answer": 2
+            },
+            {
+                "question": "Какой параметр конфигурации регулирует порог активности таблицы для запуска автоочистки?",
+                "options": ["autovacuum_vacuum_threshold", "autovacuum_analyze_threshold", "vacuum_freeze_min_age", "track_counts"],
+                "answer": 0
+            },
+            {
+                "question": "Какой параметр управляет максимальным возрастом мультитранзакций перед заморозкой?",
+                "options": ["autovacuum_freeze_max_age", "autovacuum_multixact_freeze_max_age", "vacuum_multixact_freeze_table_age", "vacuum_freeze_table_age"],
+                "answer": 1
+            },
+            {
+                "question": "Что означает значение relfrozenxid в выводе команды VACUUM (verbose)?",
+                "options": ["Номер последней транзакции, изменившей таблицу", "Номер транзакции, при которой строки были заморожены", "Количество мертвых версий строк", "Размер карты свободного пространства"],
+                "answer": 1
+            },
+            {
+                "question": "Какой параметр конфигурации регулирует долю изменений, требующих запуска автоочистки?",
+                "options": ["autovacuum_vacuum_threshold", "autovacuum_vacuum_scale_factor", "track_counts", "random_page_cost"],
+                "answer": 1
+            },
+            {
+                "question": "Какой файл в PostgreSQL содержит информацию о статусе транзакций?",
+                "options": ["pg_clog", "pg_xact", "pg_wal", "pg_fsm"],
+                "answer": 1
+            },
+            {
+                "question": "Какой уровень изоляции может увеличить число мертвых версий строк?",
+                "options": ["Read Committed", "Repeatable Read", "Serializable", "Read Uncommitted"],
+                "answer": 1
+            },
+            {
+                "question": "Какой параметр конфигурации отключает автоочистку для конкретной таблицы?",
+                "options": ["autovacuum_enabled=off", "track_counts=off", "checkpoint_segments=0", "work_mem=1MB"],
+                "answer": 0
+            },
+            {
+                "question": "Какой механизм позволяет использовать свободное пространство для новых строк?",
+                "options": ["MVCC", "Карта свободного пространства (FSM)", "Карта видимости", "WAL-журналирование"],
+                "answer": 1
+            },
+            {
+                "question": "Что означает значение free_percent в выводе pgstattuple?",
+                "options": ["Процент свободного места в таблице", "Процент мертвых версий строк", "Процент физического размера таблицы", "Процент использования индексов"],
+                "answer": 0
+            },
+            {
+                "question": "Какой процесс в PostgreSQL может вызывать ошибки 'deadlock_detected'?",
+                "options": ["autovacuum", "checkpointer", "bgwriter", "walreceiver"],
+                "answer": 0
+            },
+            {
+                "question": "Какой параметр конфигурации регулирует частоту запуска автоочистки?",
+                "options": ["autovacuum_naptime", "autovacuum_vacuum_cost_delay", "autovacuum_max_workers", "autovacuum_vacuum_threshold"],
+                "answer": 0
+            },
+            {
+                "question": "Какой файл в PostgreSQL содержит информацию о замороженных транзакциях?",
+                "options": ["pg_xact", "pg_wal", "pg_fsm", "pg_freeze"],
+                "answer": 0
+            },
+            {
+                "question": "Какой уровень изоляции может привести к разрастанию таблицы?",
+                "options": ["Read Committed", "Repeatable Read", "Serializable", "Read Uncommitted"],
+                "answer": 1
+            },
+            {
+                "question": "Какой процесс в PostgreSQL может блокировать таблицу на время выполнения?",
+                "options": ["autovacuum", "VACUUM FULL", "bgwriter", "checkpointer"],
+                "answer": 1
+            },
+            {
+                "question": "Какой параметр конфигурации регулирует минимальный возраст транзакции для заморозки строк?",
+                "options": ["autovacuum_freeze_max_age", "vacuum_freeze_min_age", "autovacuum_analyze_threshold", "autovacuum_vacuum_scale_factor"],
+                "answer": 1
+            },
+            {
+                "question": "Какой процесс в PostgreSQL обновляет карту видимости (visibility map) при очистке таблицы?",
+                "options": ["bgwriter", "autovacuum", "checkpointer", "walreceiver"],
+                "answer": 1
+            },
+            {
+                "question": "Что происходит с таблицей при выполнении команды VACUUM FULL?",
+                "options": ["Старые версии строк удаляются без изменения физического размера", "Таблица полностью перезаписывается, освобождая место на диске", "Обновляется только статистика таблицы", "Таблица блокируется только на чтение"],
+                "answer": 1
+            },
+            {
+                "question": "Какой инструмент позволяет перестроить таблицу без блокировки на уровне ACCESS EXCLUSIVE?",
+                "options": ["pg_repack", "pgstattuple", "pg_trgm", "pgcrypto"],
+                "answer": 0
+            },
+            {
+                "question": "Какой тип индекса не поддерживает неблокирующее перестроение (REINDEX CONCURRENTLY)?",
+                "options": ["B-дерево", "GIN", "BRIN", "Системные индексы"],
+                "answer": 3
+            },
+            {
+                "question": "Какой параметр конфигурации регулирует порог активности таблицы для запуска автоочистки?",
+                "options": ["autovacuum_vacuum_threshold", "autovacuum_analyze_threshold", "vacuum_freeze_min_age", "track_counts"],
+                "answer": 0
+            },
+            {
+                "question": "Какой файл системного каталога содержит информацию о замороженных мультитранзакциях?",
+                "options": ["pg_xact", "pg_multixact", "pg_clog", "pg_fsm"],
+                "answer": 1
+            },
+            {
+                "question": "Почему команда TRUNCATE предпочтительнее DELETE + VACUUM для очистки таблицы?",
+                "options": ["TRUNCATE быстрее выполняется", "TRUNCATE не требует обновления карты видимости", "TRUNCATE не оставляет мертвых версий строк", "TRUNCATE не использует WAL-журнал"],
+                "answer": 2
+            },
+            {
+                "question": "Какой параметр управляет максимальным возрастом мультитранзакций перед заморозкой?",
+                "options": ["autovacuum_freeze_max_age", "autovacuum_multixact_freeze_max_age", "vacuum_multixact_freeze_table_age", "vacuum_freeze_table_age"],
+                "answer": 1
+            },
+            {
+                "question": "Какой уровень блокировки устанавливается при выполнении REINDEX?",
+                "options": ["ACCESS SHARE", "ROW EXCLUSIVE", "SHARE", "ACCESS EXCLUSIVE"],
+                "answer": 3
+            },
+            {
+                "question": "Какой параметр конфигурации регулирует долю изменений, требующих запуска автоочистки?",
+                "options": ["autovacuum_vacuum_threshold", "autovacuum_vacuum_scale_factor", "track_counts", "random_page_cost"],
+                "answer": 1
+            },
+            {
+                "question": "Какой уровень изоляции может увеличить число мертвых версий строк при частом выполнении SELECT FOR UPDATE?",
+                "options": ["Read Committed", "Repeatable Read", "Serializable", "Read Uncommitted"],
+                "answer": 1
             }
         ];
 
