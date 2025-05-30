@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 )
 
-// Home обрабатывает главную страницу
+// Home - это название функции, которая обрабатывает маршрут /
 func Home(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
 		NotFound(w, r)
@@ -56,12 +56,12 @@ func Home(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// Test обработчик тестовой страницы
+// Test это название функции, которая обрабатывает маршрут /test
 func Test(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Test Page"))
 }
 
-// ServerInstallation обрабатывает страницу с тестом по установке и управлению сервером PostgreSQL
+// ServerInstallation это название функции, которая обрабатывает маршрут /server_installation
 func ServerInstallation(w http.ResponseWriter, r *http.Request) {
 	// Полные пути к шаблонам
 	indexPath := filepath.Join("templates", "server_installation", "index.html")
@@ -92,7 +92,7 @@ func ServerInstallation(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// UsingPsql обрабатывает страницу с тестом по использованию psql
+// UsingPsql это название функции, которая обрабатывает маршрут /using_psql
 func UsingPsql(w http.ResponseWriter, r *http.Request) {
 	// Полные пути к шаблонам
 	indexPath := filepath.Join("templates", "using_psql", "index.html")
@@ -123,7 +123,7 @@ func UsingPsql(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// ServerConfiguration обрабатывает страницу с тестом по конфигурированию сервера PostgreSQL
+// ServerConfiguration это название функции, которая обрабатывает маршрут /server_configuration
 func ServerConfiguration(w http.ResponseWriter, r *http.Request) {
 	// Полные пути к шаблонам
 	indexPath := filepath.Join("templates", "server_configuration", "index.html")
@@ -154,7 +154,7 @@ func ServerConfiguration(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// PostgreSQLQuiz обрабатывает страницу с тестом по PostgreSQL
+// PostgreSQLQuiz это название функции, которая обрабатывает маршрут /postgres_quiz
 func PostgreSQLQuiz(w http.ResponseWriter, r *http.Request) {
 	// Полные пути к шаблонам
 	indexPath := filepath.Join("templates", "postgres_quiz", "index.html")
@@ -184,7 +184,7 @@ func PostgreSQLQuiz(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// ConcurrentAccessManagement обрабатывает страницу с тестом по управлению параллельным доступом
+// ConcurrentAccessManagement это название функции, которая обрабатывает маршрут /concurrent_access_management
 func ConcurrentAccessManagement(w http.ResponseWriter, r *http.Request) {
 	// Полные пути к шаблонам
 	indexPath := filepath.Join("templates", "concurrent_access_management", "index.html")
@@ -214,10 +214,40 @@ func ConcurrentAccessManagement(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// Vacuum обрабатывает страницу с тестом по вакууму
+// Vacuum - это название функции, которая обрабатывает маршрут /vacuum
 func Vacuum(w http.ResponseWriter, r *http.Request) {
 	// Полные пути к шаблонам
 	indexPath := filepath.Join("templates", "vacuum", "index.html")
+	navbarPath := filepath.Join("templates", "navbar.html")
+	footerPath := filepath.Join("templates", "footer.html")
+
+	// Проверка существования файлов
+	if _, err := os.Stat(indexPath); os.IsNotExist(err) {
+		http.Error(w, "Index template not found", http.StatusInternalServerError)
+		return
+	}
+	if _, err := os.Stat(navbarPath); os.IsNotExist(err) {
+		http.Error(w, "Navbar template not found", http.StatusInternalServerError)
+		return
+	}
+	if _, err := os.Stat(footerPath); os.IsNotExist(err) {
+		http.Error(w, "Footer template not found", http.StatusInternalServerError)
+		return
+	}
+	// Парсинг шаблонов
+	tmpl := template.Must(template.ParseFiles(indexPath, navbarPath, footerPath))
+
+	// Рендеринг
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	if err := tmpl.Execute(w, nil); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
+// BufferCacheLog - это название функции, которая обрабатывает маршрут /buffer_cache_log
+func BufferCacheLog(w http.ResponseWriter, r *http.Request) {
+	// Полные пути к шаблонам
+	indexPath := filepath.Join("templates", "buffer_cache_log", "index.html")
 	navbarPath := filepath.Join("templates", "navbar.html")
 	footerPath := filepath.Join("templates", "footer.html")
 

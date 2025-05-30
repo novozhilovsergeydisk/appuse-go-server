@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <title>Буферный кеш и журнал</title>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/static/images/favicon.ico" type="image/x-icon">
+
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- <span class="material-icons">home</span> -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#1E40AF',
+                        success: '#10B981',
+                        danger: '#EF4444'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="bg-gray-900 text-white min-h-screen p-8">
+    {{template "navbar.html" .}}
+
+    <div class="max-w-3xl mx-auto">
+        <h1 class="text-2xl md:text-3xl font-bold mb-6 text-center">Буферный кеш и журнал</h1>
+
+        <div id="quiz-container" class="space-y-8"></div>
+
+        <button onclick="checkAnswers()"
+            class="mt-8 w-full py-3 bg-primary hover:bg-secondary text-white font-bold rounded-lg transition duration-300">
+            Проверить результат
+        </button>
+
+        <div id="result" class="hidden mt-8 p-6 bg-gray-800 rounded-lg text-center">
+            <h2 class="text-2xl font-bold mb-4">Ваш результат:</h2>
+            <p id="percentage" class="text-4xl text-primary font-mono"></p>
+        </div>
+    </div>
+
+    <script>
+        const quizData = [
+            {
+                question: "Какой размер страницы данных обычно используется в буферном кеше PostgreSQL?",
+                options: ["4 Кбайт", "8 Кбайт", "16 Кбайт", "32 Кбайт"],
+                answer: 1
+            },
+            {
+                question: "Что происходит с буфером, если процесс изменяет данные в странице буферного кеша?",
+                options: ["Буфер становится 'горячим'", "Буфер становится 'чистым'", "Буфер становится 'грязным'", "Буфер удаляется из кеша"],
+                answer: 2
+            },
+            {
+                question: "Какой алгоритм используется для вытеснения страниц из буферного кеша?",
+                options: ["FIFO", "LRU", "LFU", "OPT"],
+                answer: 1
+            },
+            {
+                question: "Какой параметр PostgreSQL определяет размер буферного кеша?",
+                options: ["shared_buffers", "work_mem", "effective_cache_size", "maintenance_work_mem"],
+                answer: 0
+            },
+            {
+                question: "Что означает метка 'hit' в выводе команды EXPLAIN при анализе запроса?",
+                options: [
+                    "Количество записей в WAL",
+                    "Количество обращений к диску",
+                    "Количество обращений к системному каталогу",
+                    "Количество обращений к данным в кеше"
+                ],
+                answer: 3
+            },
+            {
+                question: "Что означает метка 'read' в выводе команды EXPLAIN при анализе запроса?",
+                options: [
+                    "Количество записей в WAL",
+                    "Количество обращений к диску",
+                    "Количество обращений к системному каталогу",
+                    "Количество обращений к данным в кеше"
+                ],
+                answer: 1
+            },
+            {
+                question: "Как называется механизм, который гарантирует целостность данных в PostgreSQL после сбоя?",
+                options: ["ACID", "MVCC", "WAL", "Checkpointing"],
+                answer: 2
+            },
+            {
+                question: "Что означает аббревиатура WAL в контексте PostgreSQL?",
+                options: [
+                    "Write-Ahead Log",
+                    "Workload Analysis Log",
+                    "Write-After Log",
+                    "Web Access Log"
+                ],
+                answer: 0
+            },
+            {
+                question: "Какая функция используется для получения текущей позиции в WAL?",
+                options: [
+                    "pg_current_wal_lsn",
+                    "pg_get_wal_position",
+                    "pg_wal_status",
+                    "pg_get_current_lsn"
+                ],
+                answer: 0
+            },
+            {
+                question: "Какие файлы хранят журнал предзаписи (WAL)?",
+                options: [
+                    "В каталоге PGDATA/base",
+                    "В каталоге PGDATA/global",
+                    "В каталоге PGDATA/pg_wal",
+                    "В каталоге PGDATA/pg_log"
+                ],
+                answer: 2
+            },
+            {
+                question: "Какой процесс отвечает за асинхронную запись журнала WAL на диск?",
+                options: [
+                    "checkpointer",
+                    "walwriter",
+                    "background writer",
+                    "autovacuum launcher"
+                ],
+                answer: 1
+            },
+            {
+                question: "Какой процесс периодически сбрасывает грязные буферы на диск?",
+                options: [
+                    "checkpointer",
+                    "walwriter",
+                    "background writer",
+                    "logical replication launcher"
+                ],
+                answer: 0
+            },
+            {
+                question: "Какой процесс записывает часть грязных буферов, которые могут быть вытеснены в ближайшее время?",
+                options: [
+                    "checkpointer",
+                    "walwriter",
+                    "background writer",
+                    "autovacuum launcher"
+                ],
+                answer: 2
+            },
+            {
+                question: "Что происходит во время контрольной точки (checkpoint)?",
+                options: [
+                    "Сбрасываются только чистые буферы",
+                    "Сбрасываются все грязные буферы",
+                    "Удаляются старые записи из WAL",
+                    "Обновляется системный каталог"
+                ],
+                answer: 1
+            },
+            {
+                question: "Какой уровень wal_level необходим для репликации?",
+                options: [
+                    "minimal",
+                    "replica",
+                    "logical",
+                    "full"
+                ],
+                answer: 1
+            },
+            {
+                question: "Какой уровень wal_level позволяет выполнять логическую репликацию?",
+                options: [
+                    "minimal",
+                    "replica",
+                    "logical",
+                    "full"
+                ],
+                answer: 2
+            },
+            {
+                question: "Что произойдет при остановке сервера с режимом immediate?",
+                options: [
+                    "Выполняется контрольная точка",
+                    "Сервер ждёт завершения всех транзакций",
+                    "Данные остаются несогласованными",
+                    "Сохраняются все изменения в WAL"
+                ],
+                answer: 2
+            },
+            {
+                question: "Что произойдет при остановке сервера с режимом fast?",
+                options: [
+                    "Сервер завершает работу мгновенно",
+                    "Сервер обрывает соединения без контрольной точки",
+                    "Сервер выполняет контрольную точку перед остановкой",
+                    "Сервер не сохраняет изменения"
+                ],
+                answer: 2
+            },
+            {
+                question: "Какой механизм позволяет восстанавливать данные после сбоя в PostgreSQL?",
+                options: [
+                    "MVCC",
+                    "Redo-логирование",
+                    "Undo-логирование",
+                    "Файловое резервное копирование"
+                ],
+                answer: 1
+            },
+            {
+                question: "Как влияет увеличение shared_buffers на производительность?",
+                options: [
+                    "Не влияет",
+                    "Увеличивает количество операций чтения с диска",
+                    "Снижает использование памяти",
+                    "Уменьшает количество операций чтения с диска"
+                ],
+                answer: 3
+            },
+            {
+                question: "Какой процесс в PostgreSQL отвечает за фоновую запись части грязных буферов, которые могут быть вытеснены в ближайшее время?",
+                options: ["checkpointer", "walwriter", "background writer", "autovacuum launcher"],
+                answer: 2
+            },
+            {
+                question: "Какой параметр определяет уровень детализации журнала предзаписи (WAL)?",
+                options: ["wal_level", "checkpoint_segments", "shared_buffers", "work_mem"],
+                answer: 0
+            },
+            {
+                question: "Какой режим остановки сервера PostgreSQL гарантирует выполнение контрольной точки перед завершением работы?",
+                options: ["immediate", "smart", "fast", "abort"],
+                answer: 2
+            },
+            {
+                question: "Какой режим остановки сервера PostgreSQL не выполняет контрольную точку и приводит к восстановлению данных при запуске?",
+                options: ["immediate", "smart", "fast", "normal"],
+                answer: 0
+            },
+            {
+                question: "Что происходит с файлами WAL после успешной контрольной точки?",
+                options: [
+                    "Они удаляются автоматически",
+                    "Они сохраняются для резервного копирования",
+                    "Они шифруются",
+                    "Они перемещаются в архив"
+                ],
+                answer: 0
+            },
+            {
+                question: "Как называется механизм, позволяющий восстанавливать данные после сбоя в PostgreSQL?",
+                options: ["MVCC", "Redo-логирование", "Undo-логирование", "Файловое резервное копирование"],
+                answer: 1
+            },
+            {
+                question: "Какой процесс в PostgreSQL отвечает за асинхронную запись WAL на диск?",
+                options: ["checkpointer", "walwriter", "background writer", "logical replication launcher"],
+                answer: 1
+            },
+            {
+                question: "Какой уровень wal_level необходим для логической репликации?",
+                options: ["minimal", "replica", "logical", "full"],
+                answer: 2
+            },
+            {
+                question: "Какой уровень wal_level позволяет выполнять физическую репликацию?",
+                options: ["minimal", "replica", "logical", "archive"],
+                answer: 1
+            },
+            {
+                question: "Какой уровень wal_level обеспечивает минимальное количество записей в WAL только для восстановления после сбоя?",
+                options: ["minimal", "replica", "logical", "full"],
+                answer: 0
+            },
+            {
+                question: "Какой из перечисленных процессов НЕ связан напрямую с буферным кешем или журналом WAL?",
+                options: ["checkpointer", "walwriter", "background writer", "logical replication launcher"],
+                answer: 3
+            },
+            {
+                question: "Как влияет увеличение shared_buffers на производительность базы данных?",
+                options: [
+                    "Увеличивает количество операций чтения с диска",
+                    "Снижает использование памяти",
+                    "Уменьшает количество обращений к диску",
+                    "Не влияет на производительность"
+                ],
+                answer: 2
+            },
+            {
+                question: "Какие данные находятся в буфере, если он помечен как 'грязный'?",
+                options: [
+                    "Данные, прочитанные из системного каталога",
+                    "Измененные данные, которые еще не записаны на диск",
+                    "Данные, которые были удалены",
+                    "Новые данные, добавленные транзакцией"
+                ],
+                answer: 1
+            },
+            {
+                question: "Какие файлы хранят журнал предзаписи (WAL) в PostgreSQL?",
+                options: [
+                    "PGDATA/base",
+                    "PGDATA/global",
+                    "PGDATA/pg_wal",
+                    "PGDATA/pg_log"
+                ],
+                answer: 2
+            },
+            {
+                question: "Какой метод используется для восстановления согласованности данных после сбоя?",
+                options: [
+                    "Откат транзакций",
+                    "Проигрывание записей из WAL",
+                    "Восстановление из резервной копии",
+                    "Пересоздание индексов"
+                ],
+                answer: 1
+            },
+            {
+                question: "Что означает метка 'dirtied' в выводе EXPLAIN при анализе запроса?",
+                options: [
+                    "Количество обращений к диску",
+                    "Количество измененных буферов",
+                    "Количество обращений к системному каталогу",
+                    "Количество обращений к данным в кеше"
+                ],
+                answer: 1
+            },
+            {
+                question: "Какой процесс PostgreSQL отвечает за принудительную запись всех грязных буферов на диск?",
+                options: ["checkpointer", "walwriter", "background writer", "autovacuum launcher"],
+                answer: 0
+            },
+            {
+                question: "Какой из следующих факторов может повлиять на производительность при использовании WAL?",
+                options: [
+                    "Размер таблицы",
+                    "Использование fsync",
+                    "Количество пользователей",
+                    "Тип используемого индекса"
+                ],
+                answer: 1
+            },
+            {
+                question: "Какой режим записи WAL позволяет повысить производительность за счет снижения надежности?",
+                options: ["synchronous", "asynchronous", "parallel", "batched"],
+                answer: 1
+            },
+            {
+                question: "Какой тип информации добавляется в журнал на уровне wal_level=logical?",
+                options: [
+                    "Минимальная информация для восстановления",
+                    "Информация для репликации",
+                    "Логические записи о строках таблиц",
+                    "Полная история изменений"
+                ],
+                answer: 2
+            },
+            {
+                question: "Какой командой можно остановить PostgreSQL в режиме fast?",
+                options: [
+                    "pg_ctl stop -m immediate",
+                    "pg_ctlcluster 16 main stop",
+                    "pg_ctl restart",
+                    "pg_stop"
+                ],
+                answer: 1
+            },
+            {
+                question: "Что происходит при остановке PostgreSQL в режиме fast?",
+                options: [
+                    "Сервер завершает работу мгновенно без записи данных",
+                    "Сервер обрывает все соединения и выполняет контрольную точку перед выключением",
+                    "Сервер записывает только журнал WAL, не сбрасывая данные на диск",
+                    "Сервер ждёт завершения всех транзакций перед остановкой"
+                ],
+                answer: 1
+            },
+            {
+                question: "Какой командой можно остановить PostgreSQL в режиме immediate?",
+                options: [
+                    "pg_ctlcluster 16 main stop",
+                    "pg_ctl stop",
+                    "pg_ctlcluster 16 main stop -m immediate --skip-systemctl-redirect",
+                    "pg_immediate_stop"
+                ],
+                answer: 2
+            },
+            {
+                question: "Что происходит при остановке PostgreSQL в режиме immediate?",
+                options: [
+                    "Сервер выполняет контрольную точку перед остановкой",
+                    "Сервер обрывает все соединения и немедленно завершает работу без записи изменений на диск",
+                    "Сервер ждёт завершения активных транзакций",
+                    "Сервер записывает только грязные страницы буферного кеша"
+                ],
+                answer: 1
+            },
+            {
+                question: "Какие процессы PostgreSQL напрямую связаны с буферным кешом и журналом WAL?",
+                options: [
+                    "checkpointer, background writer, walwriter",
+                    "autovacuum launcher, checkpointer, walwriter",
+                    "logical replication launcher, walwriter, background writer",
+                    "walreceiver, walsender, statscollector"
+                ],
+                answer: 0
+            },
+            {
+                question: "Как получить список процессов, связанных с PostgreSQL через файл postmaster.pid?",
+                options: [
+                    "sudo cat /var/lib/postgresql/16/main/postmaster.conf",
+                    "sudo cat /var/lib/postgresql/16/main/postmaster.pid",
+                    "sudo ls /proc/<pid>/task",
+                    "psql -c 'SELECT * FROM pg_stat_activity'"
+                ],
+                answer: 1
+            },
+            {
+                question: "Как очистить лог-файл PostgreSQL перед перезапуском сервера для упрощения анализа новых сообщений?",
+                options: [
+                    "sudo rm /var/log/postgresql/postgresql-16-main.log",
+                    "sudo truncate -cs0 /var/log/postgresql/postgresql-16-main.log",
+                    "sudo touch /var/log/postgresql/postgresql-16-main.log",
+                    "sudo chown postgres:postgres /var/log/postgresql/postgresql-16-main.log"
+                ],
+                answer: 1
+            },
+            {
+                question: "Что происходит при запуске PostgreSQL после остановки в режиме immediate?",
+                options: [
+                    "Сервер сразу готов к работе",
+                    "Сервер выполняет автоматическое восстановление с помощью WAL",
+                    "Сервер требует ручного восстановления из резервной копии",
+                    "Сервер начинает выполнять автовакуум"
+                ],
+                answer: 1
+            },
+            {
+                question: "Какой процесс отвечает за фоновую запись части грязных буферов, которые могут быть вытеснены в ближайшее время?",
+                options: [
+                    "checkpointer",
+                    "background writer",
+                    "walwriter",
+                    "autovacuum launcher"
+                ],
+                answer: 1
+            },
+            {
+                question: "Какой процесс периодически сбрасывает все грязные буферы на диск?",
+                options: [
+                    "walwriter",
+                    "background writer",
+                    "checkpointer",
+                    "logical replication launcher"
+                ],
+                answer: 2
+            }
+        ];
+
+        function createQuiz() {
+            const container = document.getElementById('quiz-container');
+
+            // Количество вопросов для отображения (можно изменить)
+            const numQuestionsToShow = 10;
+
+            // Создаем копию массива вопросов
+            const shuffledQuestions = [...quizData];
+
+            // Перемешиваем вопросы случайным образом
+            for (let i = shuffledQuestions.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffledQuestions[i], shuffledQuestions[j]] = [shuffledQuestions[j], shuffledQuestions[i]];
+            }
+
+            // Выбираем нужное количество вопросов (или все, если их меньше)
+            const selectedQuestions = shuffledQuestions.slice(0, Math.min(numQuestionsToShow, shuffledQuestions.length));
+
+            // Сохраняем выбранные вопросы для проверки ответов
+            window.selectedQuizData = selectedQuestions;
+
+            // Отображаем выбранные вопросы
+            selectedQuestions.forEach((item, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = "bg-gray-800 p-6 rounded-lg";
+                questionDiv.innerHTML = `
+                <h2 class="text-xl font-semibold mb-4">${index + 1}. ${item.question}</h2>
+                <div class="space-y-2">
+                    ${item.options.map((option, i) => `
+                        <label class="flex items-center space-x-3 p-2 rounded-md hover:bg-gray-700 answer-label">
+                            <input type="radio" name="q${index}" value="${i}" class="w-4 h-4 text-primary focus:ring-primary">
+                            <span>${option}</span>
+                        </label>
+                    `).join('')}
+                </div>
+            `;
+                container.appendChild(questionDiv);
+            });
+        }
+
+        function checkAnswers() {
+            let correct = 0;
+            let hasUnanswered = false;
+            const resultDiv = document.getElementById('result');
+            const percentage = document.getElementById('percentage');
+
+            // Получаем выбранные вопросы из глобальной переменной
+            const selectedQuestions = window.selectedQuizData || [];
+
+            document.querySelectorAll('.answer-label').forEach(label => {
+                label.classList.remove('bg-green-900/20', 'bg-red-900/20', 'border', 'border-success', 'border-danger');
+            });
+
+            for (let i = 0; i < selectedQuestions.length; i++) {
+                if (!document.querySelector(`input[name="q${i}"]:checked`)) {
+                    hasUnanswered = true;
+                    break;
+                }
+            }
+
+            if (hasUnanswered) {
+                alert('Пожалуйста, ответьте на все вопросы!');
+                return;
+            }
+
+            selectedQuestions.forEach((item, index) => {
+                const selected = document.querySelector(`input[name="q${index}"]:checked`);
+                if (selected) {
+                    const selectedLabel = selected.closest('.answer-label');
+                    const correctLabel = document.querySelector(`input[name="q${index}"][value="${item.answer}"]`).closest('.answer-label');
+                    if (parseInt(selected.value) === item.answer) {
+                        correctLabel.classList.add('bg-green-900/20', 'border', 'border-success');
+                        correct++;
+                    } else {
+                        selectedLabel.classList.add('bg-red-900/20', 'border', 'border-danger');
+                        correctLabel.classList.add('bg-green-900/20', 'border', 'border-success');
+                    }
+                }
+            });
+
+            const percent = (correct / selectedQuestions.length) * 100;
+            percentage.textContent = `${percent.toFixed(1)}%`;
+            resultDiv.classList.remove('hidden');
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        }
+
+        window.onload = createQuiz;
+</script>
+
+{{template "footer.html" .}}
+</body>
+
+</html>

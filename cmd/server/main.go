@@ -19,6 +19,7 @@ func main() {
 	mux.HandleFunc("/postgres_quiz", handlers.PostgreSQLQuiz)
 	mux.HandleFunc("/concurrent_access_management", handlers.ConcurrentAccessManagement)
 	mux.HandleFunc("/vacuum", handlers.Vacuum)
+	mux.HandleFunc("/buffer_cache_log", handlers.BufferCacheLog)
 
 	// Настройка обработки статических файлов
 	staticDir := "static"
