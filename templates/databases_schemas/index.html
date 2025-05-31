@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>**********</title>
+    <title>Базы данных и схемы</title>
     <link rel="icon" href="/static/images/favicon.ico" type="image/x-icon">
 
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -25,7 +25,7 @@
                     }
                 }
             }
-        }
+        }   
     </script>
 </head>
 
@@ -33,7 +33,7 @@
     {{template "navbar.html" .}}
 
     <div class="max-w-3xl mx-auto">
-        <h1 class="text-2xl md:text-3xl font-bold mb-6 text-center">**********</h1>
+        <h1 class="text-2xl md:text-3xl font-bold mb-6 text-center">Базы данных и схемы</h1>
 
         <div id="quiz-container" class="space-y-8"></div>
 
@@ -49,7 +49,218 @@
     </div>
 
     <script>
-        
+        const quizData = [
+            // Вопросы по кластерам баз данных
+            {
+                question: "Что такое кластер баз данных в PostgreSQL?",
+                options: ["Группа взаимосвязанных баз данных", "Коллекция серверов", "Архитектура приложений", "Совокупность процессов"],
+                answer: 0
+            },
+            {
+                question: "Какие базы данных создаются при инициализации кластера PostgreSQL?",
+                options: ["Три одинаковых экземпляра", "Пустая база данных", "Несколько баз данных", "Только одна база данных"],
+                answer: 0
+            },
+            {
+                question: "Какой шаблон используется по умолчанию для создания новых баз данных в PostgreSQL?",
+                options: ["template0", "template1", "postgres", "default_db"],
+                answer: 1
+            },
+            {
+                question: "Зачем важна сохранность схемы template0 в PostgreSQL?",
+                options: ["Для восстановления из резервных копий", "Требования стандартов", "Эффективность операций", "Безопасность администрирования"],
+                answer: 0
+            },
+            {
+                question: "Каково предназначение базы данных postgres в PostgreSQL?",
+                options: ["Средство мониторинга", "Средство разработки", "Место временного хранения", "Используется по умолчанию при подключении пользователя postgres"],
+                answer: 3
+            },
+
+            // Вопросы по созданию и управлению базами данных
+            {
+                question: "Какая команда выводит список баз данных в PostgreSQL?",
+                options: ["\\l", "\\list", "\\show", "\\db"],
+                answer: 0
+            },
+            {
+                question: "Что произойдёт, если попробовать использовать действующую базу данных в качестве шаблона?",
+                options: ["Ошибка доступа", "Нормальное функционирование", "Заблокированное соединение", "Переход в режим ожидания"],
+                answer: 0
+            },
+            {
+                question: "Что означает флаг datistemplate в PostgreSQL?",
+                options: ["Показатель статуса базы данных как шаблона", "Параметр быстродействия", "Правило аутентификации", "Параметр безопасности"],
+                answer: 0
+            },
+            {
+                question: "Что делает флаг datallowconn в PostgreSQL?",
+                options: ["Разрешение подключения к базе данных", "Определение лимита подключений", "Политика отказоустойчивости", "Настройки кеширования"],
+                answer: 0
+            },
+            {
+                question: "Какая команда позволяет переименовать базу данных в PostgreSQL?",
+                options: ["ALTER DATABASE", "RENAME DATABASE", "UPDATE DATABASE", "MODIFY DATABASE"],
+                answer: 0
+            },
+
+            // Вопросы по функциям и пакетам
+            {
+                question: "Как проверить наличие определённой функции в PostgreSQL?",
+                options: ["Выполнить запрос с использованием функции", "Посмотреть справочную документацию", "Проверить журнал ошибок", "Испытать обновление ядра"],
+                answer: 0
+            },
+            {
+                question: "Как расширить функциональность PostgreSQL дополнительными возможностями?",
+                options: ["Обновление ядра", "Установка расширения с помощью CREATE EXTENSION", "Применение заплаток", "Замена исполняемого файла"],
+                answer: 1
+            },
+            {
+                question: "Какая команда рассчитывает MD5-хэш строки в PostgreSQL?",
+                options: ["digest()", "hash()", "encrypt()", "sign()"],
+                answer: 0
+            },
+            {
+                question: "Где размещаются инсталлированные расширения в PostgreSQL?",
+                options: ["В отдельном файле", "В специальных схемах", "В глобальной базе данных", "В конфигурационном файле"],
+                answer: 1
+            },
+
+            // Вопросы по схемам
+            {
+                question: "Что такое схема в PostgreSQL?",
+                options: ["Логическое пространство для размещения объектов", "Механизм аутентификации", "Формат представления данных", "Физическое устройство хранения"],
+                answer: 0
+            },
+            {
+                question: "Какие преимущества имеет использование схем в PostgreSQL?",
+                options: ["Удобство группирования объектов", "Повышенная производительность", "Снижение нагрузки на память", "Резервное копирование"],
+                answer: 0
+            },
+            {
+                question: "Какая схема создаётся автоматически в каждой базе данных PostgreSQL?",
+                options: ["public", "private", "system", "special"],
+                answer: 0
+            },
+            {
+                question: "Какая команда создаёт новую схему в PostgreSQL?",
+                options: ["CREATE SCHEMA", "ADD SCHEMA", "MAKE SCHEMA", "GENERATE SCHEMA"],
+                answer: 0
+            },
+            {
+                question: "Что произойдёт, если два пользователя создадут объекты с одинаковыми именами в разных схемах?",
+                options: ["Возникнет конфликт", "Объекты будут существовать независимо", "Преобразование в единый объект", "Возникнет ошибка сервера"],
+                answer: 1
+            },
+
+            // Вопросы по путям поиска и правам
+            {
+                question: "Какая команда выводит текущий путь поиска схем в PostgreSQL?",
+                options: ["SHOW search_path", "\\path", "LIST search_path", "SEARCH_PATH"],
+                answer: 0
+            },
+            {
+                question: "Что означает символ $user в пути поиска PostgreSQL?",
+                options: ["Имя текущего пользователя", "Имя текущей базы данных", "Символьная константа", "Администратор системы"],
+                answer: 0
+            },
+            {
+                question: "Какая схема автоматически добавляется в начало пути поиска PostgreSQL?",
+                options: ["pg_catalog", "pg_temp", "pg_user", "pg_shared"],
+                answer: 0
+            },
+            {
+                question: "Как сменить порядок следования схем в пути поиска PostgreSQL?",
+                options: ["SET SEARCH_PATH", "CHANGE SEARCH_PATH", "SWAP SEARCH_PATH", "MODIFY SEARCH_PATH"],
+                answer: 0
+            },
+            {
+                question: "Что произойдёт, если нужной схемы нет в пути поиска PostgreSQL?",
+                options: ["Возврат ошибки", "Автоматическое создание схемы", "Продолжение поиска в следующем разделе", "Подключение прервётся"],
+                answer: 2
+            },
+
+            // Дополнительные вопросы
+            {
+                question: "Что происходит при попытке удалить схему, содержащую объекты?",
+                options: ["Ошибка операции", "Принудительное удаление", "Нужно использовать ключ CASCADE", "Начинается процесс очистки"],
+                answer: 2
+            },
+            {
+                question: "Какая команда определяет размер базы данных в PostgreSQL?",
+                options: ["PG_DATABASE_SIZE", "DB_SIZE", "GET_SIZE", "CHECK_SIZE"],
+                answer: 0
+            },
+            {
+                question: "Какая схема защищена системой PostgreSQL и не подлежит изменениям?",
+                options: ["pg_user", "pg_temp", "pg_catalog", "pg_storage"],
+                answer: 2
+            },
+            {
+                question: "Какая схема предоставляется по умолчанию каждому пользователю в PostgreSQL?",
+                options: ["public", "private", "shared", "personal"],
+                answer: 0
+            },
+            {
+                question: "Максимально допустимая длина полного имени объекта в PostgreSQL:",
+                options: ["63 символа", "256 символов", "128 символов", "Длина неограничена"],
+                answer: 0
+            },
+
+            // Дополнительные уникальные вопросы
+            {
+                question: "Что происходит при установке расширения в PostgreSQL?",
+                options: ["Изменение структуры данных", "Интеграция новых возможностей", "Создание индекса", "Модификация существующего поведения"],
+                answer: 1
+            },
+            {
+                question: "Какая команда PostgreSQL используется для вывода подробного описания таблицы?",
+                options: ["DESCRIBE", "\\describe", "\\d", "EXPLAIN"],
+                answer: 2
+            },
+            {
+                question: "Что означает понятие \"logically clustered\" в контексте PostgreSQL?",
+                options: ["Структурная организация", "Физическое размещение", "Сжатие данных", "Распределённое хранение"],
+                answer: 0
+            },
+            {
+                question: "Какая команда создаёт временную таблицу в PostgreSQL?",
+                options: ["CREATE TABLE", "CREATE TEMPORARY TABLE", "TEMP TABLE", "MAKE TABLE"],
+                answer: 1
+            },
+            {
+                question: "Какая схема служит источником по умолчанию для создания новых баз данных в PostgreSQL?",
+                options: ["template0", "template1", "postgres", "public"],
+                answer: 1
+            },
+
+            // Заключение
+            {
+                question: "Какая команда устанавливает путь поиска схем в PostgreSQL на уровне сессии?",
+                options: ["SET SESSION", "SET SEARCH_PATH", "SET PATH", "SET SCHEMAS"],
+                answer: 1
+            },
+            {
+                question: "Какая команда PostgreSQL используется для переноса объекта в другую схему?",
+                options: ["MOVE OBJECT", "TRANSFER OBJECT", "ALTER TABLE SET SCHEMA", "SWAP SCHEMA"],
+                answer: 2
+            },
+            {
+                question: "Какая команда позволяет просмотреть структуру базы данных в PostgreSQL?",
+                options: ["DESCRIBE DATABASE", "\\d+", "\\list", "STRUCTURE"],
+                answer: 1
+            },
+            {
+                question: "Что происходит при попытке удалить схему, зависимую от других объектов?",
+                options: ["Ошибка удаления", "Каскадное удаление", "Приведение схемы к пустой", "Задержка выполнения"],
+                answer: 0
+            },
+            {
+                question: "Какая команда удаляет базу данных в PostgreSQL?",
+                options: ["DELETE DATABASE", "REMOVE DATABASE", "DROP DATABASE", "DESTROY DATABASE"],
+                answer: 2
+            }
+        ];
 
         function createQuiz() {
             const container = document.getElementById('quiz-container');
