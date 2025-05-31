@@ -20,6 +20,7 @@ func main() {
 	mux.HandleFunc("/concurrent_access_management", handlers.ConcurrentAccessManagement)
 	mux.HandleFunc("/vacuum", handlers.Vacuum)
 	mux.HandleFunc("/buffer_cache_log", handlers.BufferCacheLog)
+	mux.HandleFunc("/databases_schemas", handlers.DatabasesSchemas)
 
 	// Настройка обработки статических файлов
 	staticDir := "static"
