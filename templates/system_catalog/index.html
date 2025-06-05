@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Системный каталог</title>
+    <link rel="icon" href="/static/images/favicon.ico" type="image/x-icon">
+
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- <span class="material-icons">home</span> -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#1E40AF',
+                        success: '#10B981',
+                        danger: '#EF4444'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="bg-gray-900 text-white min-h-screen p-8">
+    {{template "navbar.html" .}}
+
+    <div class="max-w-3xl mx-auto">
+        <h1 class="text-2xl md:text-3xl font-bold mb-6 text-center">Системный каталог</h1>
+
+        <div id="quiz-container" class="space-y-8"></div>
+
+        <button onclick="checkAnswers()"
+            class="mt-8 w-full py-3 bg-primary hover:bg-secondary text-white font-bold rounded-lg transition duration-300">
+            Проверить результат
+        </button>
+
+        <div id="result" class="hidden mt-8 p-6 bg-gray-800 rounded-lg text-center">
+            <h2 class="text-2xl font-bold mb-4">Ваш результат:</h2>
+            <p id="percentage" class="text-4xl text-primary font-mono"></p>
+        </div>
+    </div>
+
+    <script>
+        const quizData = [
+            {
+                question: "Что представляет собой системный каталог в PostgreSQL?",
+                options: ["Набор таблиц и представлений с описанием всех объектов СУБД", "Хранилище данных пользователей", "Файл конфигурации сервера", "Лог-файлы системы"],
+                answer: 0
+            },
+            {
+                question: "Какие объекты содержат данные обо всей структуре кластера PostgreSQL?",
+                options: ["Отдельные базы данных и общие объекты", "Только отдельные базы данных", "Только общие объекты", "Пользовательские приложения"],
+                answer: 0
+            },
+            {
+                question: "Где расположены таблицы и представления системного каталога?",
+                options: ["В специальной схеме pg_catalog", "В произвольной схеме", "В корневой директории сервера", "В стандартной схеме information_schema"],
+                answer: 0
+            },
+            {
+                question: "Почему не рекомендуется создавать объекты, начинающиеся с \"pg_\"?",
+                options: ["Невозможно создать такие объекты", "Это устаревшая практика", "Потенциальные конфликты с объектами системного каталога", "Нет смысла использовать такую нотацию"],
+                answer: 2
+            },
+            {
+                question: "Какой инструмент удобно использовать для просмотра структур объектов в графическом интерфейсе?",
+                options: ["Редактор SQL-запросов", "Консольный клиент PostgreSQL", "Графическая среда разработки и управления", "Отладчик приложений"],
+                answer: 2
+            },
+            {
+                question: "Какие команды psql позволяют быстро получать информацию из системного каталога?",
+                options: ["\d-команды", "\l-команды", "\q-команды", "\w-команды"],
+                answer: 0
+            },
+            {
+                question: "Что описывает таблица pg_class в PostgreSQL?",
+                options: ["Объекты базы данных", "Настройки сервера", "Права доступа пользователей", "Метаданные процессов"],
+                answer: 0
+            },
+            {
+                question: "Что определяет тип объекта в таблице pg_class?",
+                options: ["Столбец relkind", "Столбец relname", "Столбец reltype", "Столбец relnamespace"],
+                answer: 0
+            },
+            {
+                question: "Как называется специальный тип данных для идентификации объектов в PostgreSQL?",
+                options: ["OID", "UUID", "GUID", "SID"],
+                answer: 0
+            },
+            {
+                question: "Какое ограничение по размеру имеет тип данных OID в PostgreSQL?",
+                options: ["Максимально 32 бит", "Максимально 64 бит", "Максимально 128 бит", "Максимально 256 бит"],
+                answer: 0
+            },
+            {
+                question: "Какие операции поддерживаются для типа данных OID?",
+                options: ["Только сравнение", "Любые арифметические операции", "Операции преобразования и сопоставления", "Операторы упорядочивания"],
+                answer: 2
+            },
+            {
+                question: "Какая команда psql выводит информацию о внутренних структурах системного каталога?",
+                options: ["\\dt", "\\d+", "\\list", "\\show"],
+                answer: 1
+            },
+            {
+                question: "Какая схема в PostgreSQL предназначена для хранения временной информации?",
+                options: ["pg_temp", "pg_public", "pg_system", "pg_temporary"],
+                answer: 0
+            },
+            {
+                question: "Какие псевдонимы типа OID предоставляются в PostgreSQL?",
+                options: ["Регулярные выражения", "Символьные имена объектов", "Различные идентификаторы объектов", "Префиксы таблиц"],
+                answer: 2
+            },
+            {
+                question: "Какой режим сохранения применяется к постоянным объектам в PostgreSQL?",
+                options: ["Постоянный (permanent)", "Временный (temporary)", "Общий (shared)", "Перезагрузка (reload)"],
+                answer: 0
+            },
+            {
+                question: "Что происходит при активной работе с временными объектами в системном каталоге?",
+                options: ["Уменьшается производительность", "Повышается скорость обработки", "Происходит автоматическая очистка", "Генерируются новые таблицы"],
+                answer: 0
+            },
+            {
+                question: "Какую команду psql можно использовать для получения списка всех таблиц в базе данных?",
+                options: ["\\dt", "\\ds", "\\du", "\\dp"],
+                answer: 0
+            },
+            {
+                question: "Какой вид представления доступен в схеме information_schema?",
+                options: ["views", "tables", "triggers", "sequences"],
+                answer: 0
+            },
+            {
+                question: "Как определить идентификатор таблицы (OID) без ручного поиска?",
+                options: ["Привести название таблицы к типу regclass", "Выполнить ручной подсчёт записей", "Использовать команду \\d", "Задать особый параметр в конфигурационном файле"],
+                answer: 0
+            },
+            {
+                question: "Какая особенность связана с использованием типов reg*, связанных с объектом?",
+                options: ["Создание зависимостей", "Автоматическое удаление объектов", "Игнорирование прав доступа", "Необходимость дополнительного разрешения"],
+                answer: 0
+            },
+            {
+                question: "Какая дополнительная возможность доступна при установке параметра ECHO_HIDDEN в psql?",
+                options: ["Показ скрытых метаданных", "Вывод полного синтаксиса SQL-запросов", "Удалённое управление сервером", "Изменение настроек безопасности"],
+                answer: 1
+            },
+            {
+                question: "Какая схема содержит наиболее полную информацию о содержимом кластера в PostgreSQL?",
+                options: ["public", "pg_catalog", "information_schema", "pg_temp"],
+                answer: 1
+            },
+            {
+                question: "Какой стандарт SQL предписывает использование схемы information_schema?",
+                options: ["SQL-89", "SQL-2003", "SQL-92", "SQL-2011"],
+                answer: 1
+            },
+            {
+                question: "Какой префикс используется для названий таблиц системного каталога?",
+                options: ["sys_", "pg_", "db_", "psql_"],
+                answer: 1
+            },
+            {
+                question: "Какой столбец обычно является первичным ключом в большинстве таблиц системного каталога?",
+                options: ["id", "name", "oid", "relname"],
+                answer: 2
+            },
+            {
+                question: "Какой тип данных представляет собой псевдоним oid для таблицы pg_class?",
+                options: ["regtype", "regclass", "regproc", "regnamespace"],
+                answer: 1
+            },
+            {
+                question: "Какое представление отображает список всех пользовательских таблиц в PostgreSQL?",
+                options: ["pg_relations", "pg_attributes", "pg_tables", "pg_views"],
+                answer: 2
+            },
+            {
+                question: "Какой столбец в таблице pg_class указывает на тип объекта (таблица, индекс и т.д.)?",
+                options: ["relname", "relkind", "relowner", "relpersistence"],
+                answer: 1
+            },
+            {
+                question: "Какой символ в столбце relkind обозначает обычную таблицу?",
+                options: ["t", "v", "i", "r"],
+                answer: 3
+            },
+            {
+                question: "Какой символ в столбце relkind обозначает временную таблицу?",
+                options: ["t", "r", "v", "i"],
+                answer: 0
+            },
+            {
+                question: "Какой символ в столбце relkind обозначает представление?",
+                options: ["v", "t", "r", "i"],
+                answer: 0
+            },
+            {
+                question: "Какой символ в столбце relkind обозначает последовательность?",
+                options: ["S", "s", "Seq", "seq"],
+                answer: 0
+            },
+            {
+                question: "Какой символ в столбце relkind обозначает индекс?",
+                options: ["i", "I", "idx", "index"],
+                answer: 0
+            },
+            {
+                question: "Какая команда psql выводит список всех таблиц?",
+                options: ["\\dv", "\\df", "\\dn", "\\dt"],
+                answer: 3
+            },
+            {
+                question: "Какая команда psql выводит список всех представлений?",
+                options: ["\\dt", "\\dv", "\\df", "\\dn"],
+                answer: 1
+            },
+            {
+                question: "Какая команда psql выводит список всех схем?",
+                options: ["\\dn", "\\dt", "\\df", "\\dv"],
+                answer: 0
+            },
+            {
+                question: "Какая команда psql выводит список всех функций?",
+                options: ["\\df", "\\dt", "\\dv", "\\dn"],
+                answer: 0
+            },
+            {
+                question: "Какой тип данных используется для хранения идентификаторов объектов в PostgreSQL?",
+                options: ["int", "oid", "uuid", "serial"],
+                answer: 1
+            },
+            {
+                question: "Какой тип данных позволяет преобразовать имя типа в oid?",
+                options: ["regproc", "regtype", "regclass", "regnamespace"],
+                answer: 1
+            },
+            {
+                question: "Какой тип данных позволяет преобразовать имя схемы в oid?",
+                options: ["regnamespace", "regclass", "regtype", "regproc"],
+                answer: 0
+            },
+            {
+                question: "Какой тип данных позволяет преобразовать имя функции в oid?",
+                options: ["regproc", "regprocedure", "regfunc", "regclass"],
+                answer: 0
+            },
+            {
+                question: "Какой столбец в pg_attribute хранит OID отношения, к которому принадлежит атрибут?",
+                options: ["attname", "attrelid", "atttypid", "attnum"],
+                answer: 1
+            },
+            {
+                question: "Какой столбец в pg_attribute хранит имя атрибута?",
+                options: ["attname", "attrelid", "atttypid", "attnum"],
+                answer: 0
+            },
+            {
+                question: "Какой столбец в pg_attribute хранит OID типа данных атрибута?",
+                options: ["atttypid", "attrelid", "attname", "attnum"],
+                answer: 0
+            },
+            {
+                question: "Какая таблица хранит описание всех объектов PostgreSQL (таблиц, индексов, представлений и др.)?",
+                options: ["pg_class", "pg_attribute", "pg_namespace", "pg_type"],
+                answer: 0
+            },
+            {
+                question: "Какая таблица хранит описание столбцов отношений?",
+                options: ["pg_attribute", "pg_class", "pg_namespace", "pg_type"],
+                answer: 0
+            },
+            {
+                question: "Какая таблица хранит описание схем?",
+                options: ["pg_namespace", "pg_class", "pg_attribute", "pg_type"],
+                answer: 0
+            },
+            {
+                question: "Какая таблица хранит описание типов данных?",
+                options: ["pg_type", "pg_class", "pg_namespace", "pg_attribute"],
+                answer: 0
+            },
+            {
+                question: "Какой столбец в pg_class указывает на владельца объекта?",
+                options: ["relowner", "relname", "relnamespace", "relkind"],
+                answer: 0
+            },
+            {
+                question: "Какой столбец в pg_class указывает на пространство имён (схему)?",
+                options: ["relnamespace", "relowner", "relkind", "relpersistence"],
+                answer: 0
+            },
+            {
+                question: "Какой столбец в pg_class определяет, является ли объект постоянным или временным?",
+                options: ["relpersistence", "relkind", "relnamespace", "relowner"],
+                answer: 0
+            },
+            {
+                question: "Какая схема содержит наиболее полную информацию о содержимом кластера в PostgreSQL?",
+                options: ["public", "pg_catalog", "information_schema", "pg_temp"],
+                answer: 1
+            },
+            {
+                question: "Какой стандарт SQL предписывает использование схемы information_schema?",
+                options: ["SQL-89", "SQL-2003", "SQL-92", "SQL-2011"],
+                answer: 1
+            },
+            {
+                question: "Какой префикс используется для названий таблиц системного каталога?",
+                options: ["sys_", "pg_", "db_", "psql_"],
+                answer: 1
+            },
+            {
+                question: "Какой столбец обычно является первичным ключом в большинстве таблиц системного каталога?",
+                options: ["id", "name", "oid", "relname"],
+                answer: 2
+            },
+            {
+                question: "Какой тип данных представляет собой псевдоним oid для таблицы pg_class?",
+                options: ["regtype", "regclass", "regproc", "regnamespace"],
+                answer: 1
+            },
+            {
+                question: "Какое представление отображает список всех пользовательских таблиц в PostgreSQL?",
+                options: ["pg_relations", "pg_attributes", "pg_tables", "pg_views"],
+                answer: 2
+            },
+            {
+                question: "Какой столбец в таблице pg_class указывает на тип объекта (таблица, индекс и т.д.)?",
+                options: ["relname", "relkind", "relowner", "relpersistence"],
+                answer: 1
+            },
+            {
+                question: "Какой символ в столбце relkind обозначает обычную таблицу?",
+                options: ["t", "v", "i", "r"],
+                answer: 3
+            },
+            {
+                question: "Какой символ в столбце relkind обозначает временную таблицу?",
+                options: ["t", "r", "v", "i"],
+                answer: 0
+            },
+            {
+                question: "Какой символ в столбце relkind обозначает представление?",
+                options: ["v", "t", "r", "i"],
+                answer: 0
+            },
+            {
+                question: "Какой символ в столбце relkind обозначает последовательность?",
+                options: ["S", "s", "Seq", "seq"],
+                answer: 0
+            },
+            {
+                question: "Какой символ в столбце relkind обозначает индекс?",
+                options: ["i", "I", "idx", "index"],
+                answer: 0
+            },
+            {
+                question: "Какая команда psql выводит список всех таблиц?",
+                options: ["\\dv", "\\df", "\\dn", "\\dt"],
+                answer: 3
+            },
+            {
+                question: "Какая команда psql выводит список всех представлений?",
+                options: ["\\dt", "\\dv", "\\df", "\\dn"],
+                answer: 1
+            },
+            {
+                question: "Какая команда psql выводит список всех схем?",
+                options: ["\\dn", "\\dt", "\\df", "\\dv"],
+                answer: 0
+            },
+            {
+                question: "Какая команда psql выводит список всех функций?",
+                options: ["\\df", "\\dt", "\\dv", "\\dn"],
+                answer: 0
+            },
+            {
+                question: "Какой тип данных используется для хранения идентификаторов объектов в PostgreSQL?",
+                options: ["int", "oid", "uuid", "serial"],
+                answer: 1
+            },
+            {
+                question: "Какой тип данных позволяет преобразовать имя типа в oid?",
+                options: ["regproc", "regtype", "regclass", "regnamespace"],
+                answer: 1
+            },
+            {
+                question: "Какой тип данных позволяет преобразовать имя схемы в oid?",
+                options: ["regnamespace", "regclass", "regtype", "regproc"],
+                answer: 0
+            },
+            {
+                question: "Какой тип данных позволяет преобразовать имя функции в oid?",
+                options: ["regproc", "regprocedure", "regfunc", "regclass"],
+                answer: 0
+            },
+            {
+                question: "Какой столбец в pg_attribute хранит OID отношения, к которому принадлежит атрибут?",
+                options: ["attname", "attrelid", "atttypid", "attnum"],
+                answer: 1
+            },
+            {
+                question: "Какой столбец в pg_attribute хранит имя атрибута?",
+                options: ["attname", "attrelid", "atttypid", "attnum"],
+                answer: 0
+            },
+            {
+                question: "Какой столбец в pg_attribute хранит OID типа данных атрибута?",
+                options: ["atttypid", "attrelid", "attname", "attnum"],
+                answer: 0
+            },
+            {
+                question: "Какая таблица хранит описание всех объектов PostgreSQL (таблиц, индексов, представлений и др.)?",
+                options: ["pg_class", "pg_attribute", "pg_namespace", "pg_type"],
+                answer: 0
+            },
+            {
+                question: "Какая таблица хранит описание столбцов отношений?",
+                options: ["pg_attribute", "pg_class", "pg_namespace", "pg_type"],
+                answer: 0
+            },
+            {
+                question: "Какая таблица хранит описание схем?",
+                options: ["pg_namespace", "pg_class", "pg_attribute", "pg_type"],
+                answer: 0
+            },
+            {
+                question: "Какая таблица хранит описание типов данных?",
+                options: ["pg_type", "pg_class", "pg_namespace", "pg_attribute"],
+                answer: 0
+            },
+            {
+                question: "Какой столбец в pg_class указывает на владельца объекта?",
+                options: ["relowner", "relname", "relnamespace", "relkind"],
+                answer: 0
+            },
+            {
+                question: "Какой столбец в pg_class указывает на пространство имён (схему)?",
+                options: ["relnamespace", "relowner", "relkind", "relpersistence"],
+                answer: 0
+            },
+            {
+                question: "Какой столбец в pg_class определяет, является ли объект постоянным или временным?",
+                options: ["relpersistence", "relkind", "relnamespace", "relowner"],
+                answer: 0
+            }
+        ];
+
+        function createQuiz() {
+            const container = document.getElementById('quiz-container');
+
+            // Количество вопросов для отображения (можно изменить)
+            const numQuestionsToShow = 10;
+
+            // Создаем копию массива вопросов
+            const shuffledQuestions = [...quizData];
+
+            // Перемешиваем вопросы случайным образом
+            for (let i = shuffledQuestions.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffledQuestions[i], shuffledQuestions[j]] = [shuffledQuestions[j], shuffledQuestions[i]];
+            }
+
+            // Выбираем нужное количество вопросов (или все, если их меньше)
+            const selectedQuestions = shuffledQuestions.slice(0, Math.min(numQuestionsToShow, shuffledQuestions.length));
+
+            // Сохраняем выбранные вопросы для проверки ответов
+            window.selectedQuizData = selectedQuestions;
+
+            // Отображаем выбранные вопросы
+            selectedQuestions.forEach((item, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = "bg-gray-800 p-6 rounded-lg";
+                questionDiv.innerHTML = `
+                <h2 class="text-xl font-semibold mb-4">${index + 1}. ${item.question}</h2>
+                <div class="space-y-2">
+                    ${item.options.map((option, i) => `
+                        <label class="flex items-center space-x-3 p-2 rounded-md hover:bg-gray-700 answer-label">
+                            <input type="radio" name="q${index}" value="${i}" class="w-4 h-4 text-primary focus:ring-primary">
+                            <span>${option}</span>
+                        </label>
+                    `).join('')}
+                </div>
+            `;
+                container.appendChild(questionDiv);
+            });
+        }
+
+        function checkAnswers() {
+            let correct = 0;
+            let hasUnanswered = false;
+            const resultDiv = document.getElementById('result');
+            const percentage = document.getElementById('percentage');
+
+            // Получаем выбранные вопросы из глобальной переменной
+            const selectedQuestions = window.selectedQuizData || [];
+
+            document.querySelectorAll('.answer-label').forEach(label => {
+                label.classList.remove('bg-green-900/20', 'bg-red-900/20', 'border', 'border-success', 'border-danger');
+            });
+
+            for (let i = 0; i < selectedQuestions.length; i++) {
+                if (!document.querySelector(`input[name="q${i}"]:checked`)) {
+                    hasUnanswered = true;
+                    break;
+                }
+            }
+
+            if (hasUnanswered) {
+                alert('Пожалуйста, ответьте на все вопросы!');
+                return;
+            }
+
+            selectedQuestions.forEach((item, index) => {
+                const selected = document.querySelector(`input[name="q${index}"]:checked`);
+                if (selected) {
+                    const selectedLabel = selected.closest('.answer-label');
+                    const correctLabel = document.querySelector(`input[name="q${index}"][value="${item.answer}"]`).closest('.answer-label');
+                    if (parseInt(selected.value) === item.answer) {
+                        correctLabel.classList.add('bg-green-900/20', 'border', 'border-success');
+                        correct++;
+                    } else {
+                        selectedLabel.classList.add('bg-red-900/20', 'border', 'border-danger');
+                        correctLabel.classList.add('bg-green-900/20', 'border', 'border-success');
+                    }
+                }
+            });
+
+            const percent = (correct / selectedQuestions.length) * 100;
+            percentage.textContent = `${percent.toFixed(1)}%`;
+            resultDiv.classList.remove('hidden');
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        }
+
+        window.onload = createQuiz;
+</script>
+
+{{template "footer.html" .}}
+</body>
+
+</html>
