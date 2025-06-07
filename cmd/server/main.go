@@ -23,6 +23,7 @@ func main() {
 	mux.HandleFunc("/databases_schemas", handlers.DatabasesSchemas)
 	mux.HandleFunc("/system_catalog", handlers.SystemCatalog)
 	mux.HandleFunc("/tablespaces", handlers.Tablespaces)
+	mux.HandleFunc("/low_level", handlers.LowLevel)
 
 	// Настройка обработки статических файлов
 	staticDir := "static"

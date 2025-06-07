@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Низкоуровневые механизмы</title>
+    <link rel="icon" href="/static/images/favicon.ico" type="image/x-icon">
+
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- <span class="material-icons">home</span> -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#1E40AF',
+                        success: '#10B981',
+                        danger: '#EF4444'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="bg-gray-900 text-white min-h-screen p-8">
+    {{template "navbar.html" .}}
+
+    <div class="max-w-3xl mx-auto">
+        <h1 class="text-2xl md:text-3xl font-bold mb-6 text-center">Низкоуровневые механизмы</h1>   
+
+        <div id="quiz-container" class="space-y-8"></div>
+
+        <button onclick="checkAnswers()"
+            class="mt-8 w-full py-3 bg-primary hover:bg-secondary text-white font-bold rounded-lg transition duration-300">
+            Проверить результат
+        </button>
+
+        <div id="result" class="hidden mt-8 p-6 bg-gray-800 rounded-lg text-center">
+            <h2 class="text-2xl font-bold mb-4">Ваш результат:</h2>
+            <p id="percentage" class="text-4xl text-primary font-mono"></p>
+        </div>
+    </div>
+
+    <script>
+        const quizData = [
+            {
+                question: "Какой максимальный размер файла слоя до создания нового сегмента?",
+                options: ["1 Гбайт", "2 Гбайта", "500 Мбайт", "8 Гбайт"],
+                answer: 0
+            },
+            {
+                question: "Какой слой используется только для таблиц?",
+                options: ["main", "init", "vm", "fsm"],
+                answer: 2
+            },
+            {
+                question: "Для какого типа объектов не создается слой init?",
+                options: ["Обычные таблицы", "Индексы", "Нежурналируемые таблицы", "Материализованные представления"],
+                answer: 1
+            },
+            {
+                question: "Как называется слой, содержащий данные версий строк или индексных записей?",
+                options: ["main", "init", "vm", "fsm"],
+                answer: 0
+            },
+            {
+                question: "Какая функция используется для получения полного пути к файлу отношения?",
+                options: ["pg_table_size", "pg_relation_filepath", "pg_class", "pg_database"],
+                answer: 1
+            },
+            {
+                question: "Какой префикс добавляется к имени файла временной таблицы?",
+                options: ["t_", "temp_", "t4_", "tmp_"],
+                answer: 2
+            },
+            {
+                question: "Какая утилита позволяет связать объекты БД с соответствующими файлами?",
+                options: ["psql", "pg_dump", "oid2name", "pg_restore"],
+                answer: 2
+            },
+            {
+                question: "Какой слой существует и для таблиц, и для индексов?",
+                options: ["main", "init", "vm", "fsm"],
+                answer: 3
+            },
+            {
+                question: "Какая функция показывает общий размер таблицы вместе со всеми индексами?",
+                options: ["pg_table_size", "pg_indexes_size", "pg_total_relation_size", "pg_relation_size"],
+                answer: 2
+            },
+            {
+                question: "Какой тип хранения данных используется по умолчанию для большинства типов данных, совместимых с TOAST?",
+                options: ["PLAIN", "EXTERNAL", "MAIN", "EXTENDED"],
+                answer: 3
+            },
+            {
+                question: "Какой слой содержит информацию о свободном пространстве в страницах таблиц и индексов?",
+                options: ["main", "init", "vm", "fsm"],
+                answer: 3
+            },
+            {
+                question: "Какое ограничение на логический размер значения в формате TOAST?",
+                options: ["1 Кбайт", "1 Мбайт", "1 Гбайт", "1 Тбайт"],
+                answer: 2
+            },
+            {
+                question: "Какая стратегия хранения разрешает сжатие, но не отдельное хранение данных на диске?",
+                options: ["PLAIN", "EXTERNAL", "MAIN", "EXTENDED"],
+                answer: 2
+            },
+            {
+                question: "Какой столбец toast-таблицы используется для уникальной идентификации значения?",
+                options: ["chunk_data", "chunk_seq", "chunk_id", "chunk_oid"],
+                answer: 2
+            },
+            {
+                question: "Какой размер указателя на хранимое на диске значение TOAST?",
+                options: ["8 байт", "18 байт", "32 байта", "64 байта"],
+                answer: 1
+            }
+        ];
+
+        function createQuiz() {
+            const container = document.getElementById('quiz-container');
+
+            // Количество вопросов для отображения (можно изменить)
+            const numQuestionsToShow = 10;
+
+            // Создаем копию массива вопросов
+            const shuffledQuestions = [...quizData];
+
+            // Перемешиваем вопросы случайным образом
+            for (let i = shuffledQuestions.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffledQuestions[i], shuffledQuestions[j]] = [shuffledQuestions[j], shuffledQuestions[i]];
+            }
+
+            // Выбираем нужное количество вопросов (или все, если их меньше)
+            const selectedQuestions = shuffledQuestions.slice(0, Math.min(numQuestionsToShow, shuffledQuestions.length));
+
+            // Сохраняем выбранные вопросы для проверки ответов
+            window.selectedQuizData = selectedQuestions;
+
+            // Отображаем выбранные вопросы
+            selectedQuestions.forEach((item, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = "bg-gray-800 p-6 rounded-lg";
+                questionDiv.innerHTML = `
+                <h2 class="text-xl font-semibold mb-4">${index + 1}. ${item.question}</h2>
+                <div class="space-y-2">
+                    ${item.options.map((option, i) => `
+                        <label class="flex items-center space-x-3 p-2 rounded-md hover:bg-gray-700 answer-label">
+                            <input type="radio" name="q${index}" value="${i}" class="w-4 h-4 text-primary focus:ring-primary">
+                            <span>${option}</span>
+                        </label>
+                    `).join('')}
+                </div>
+            `;
+                container.appendChild(questionDiv);
+            });
+        }
+
+        function checkAnswers() {
+            let correct = 0;
+            let hasUnanswered = false;
+            const resultDiv = document.getElementById('result');
+            const percentage = document.getElementById('percentage');
+
+            // Получаем выбранные вопросы из глобальной переменной
+            const selectedQuestions = window.selectedQuizData || [];
+
+            document.querySelectorAll('.answer-label').forEach(label => {
+                label.classList.remove('bg-green-900/20', 'bg-red-900/20', 'border', 'border-success', 'border-danger');
+            });
+
+            for (let i = 0; i < selectedQuestions.length; i++) {
+                if (!document.querySelector(`input[name="q${i}"]:checked`)) {
+                    hasUnanswered = true;
+                    break;
+                }
+            }
+
+            if (hasUnanswered) {
+                alert('Пожалуйста, ответьте на все вопросы!');
+                return;
+            }
+
+            selectedQuestions.forEach((item, index) => {
+                const selected = document.querySelector(`input[name="q${index}"]:checked`);
+                if (selected) {
+                    const selectedLabel = selected.closest('.answer-label');
+                    const correctLabel =
+                        document.querySelector(`input[name="q${index}"][value="${item.answer}"]`).closest('.answer-label');
+                    if (parseInt(selected.value) === item.answer) {
+                        correctLabel.classList.add('bg-green-900/20', 'border', 'border-success');
+                        correct++;
+                    } else {
+                        selectedLabel.classList.add('bg-red-900/20', 'border', 'border-danger');
+                        correctLabel.classList.add('bg-green-900/20', 'border', 'border-success');
+                    }
+                }
+            });
+
+            const percent = (correct / selectedQuestions.length) * 100;
+            percentage.textContent = `${percent.toFixed(1)}%`;
+            resultDiv.classList.remove('hidden');
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        }
+
+        window.onload = createQuiz;
+    </script>
+
+    {{template "footer.html" .}}
+</body>
+
+</html>
