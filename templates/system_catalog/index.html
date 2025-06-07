@@ -57,8 +57,8 @@
             },
             {
                 question: "Какие объекты содержат данные обо всей структуре кластера PostgreSQL?",
-                options: ["Отдельные базы данных и общие объекты", "Только отдельные базы данных", "Только общие объекты", "Пользовательские приложения"],
-                answer: 0
+                options: [,"Только отдельные базы данных", "Только общие объекты", "Пользовательские приложения", "Отдельные базы данных и общие объекты"],
+                answer: 3
             },
             {
                 question: "Где расположены таблицы и представления системного каталога?",
@@ -82,13 +82,13 @@
             },
             {
                 question: "Что описывает таблица pg_class в PostgreSQL?",
-                options: ["Объекты базы данных", "Настройки сервера", "Права доступа пользователей", "Метаданные процессов"],
-                answer: 0
+                options: ["Настройки сервера", "Объекты базы данных", "Права доступа пользователей", "Метаданные процессов"],
+                answer: 1
             },
             {
                 question: "Что определяет тип объекта в таблице pg_class?",
-                options: ["Столбец relkind", "Столбец relname", "Столбец reltype", "Столбец relnamespace"],
-                answer: 0
+                options: ["Столбец relname", "Столбец reltype", "Столбец relnamespace", "Столбец relkind"],
+                answer: 3
             },
             {
                 question: "Как называется специальный тип данных для идентификации объектов в PostgreSQL?",
@@ -127,23 +127,18 @@
             },
             {
                 question: "Что происходит при активной работе с временными объектами в системном каталоге?",
-                options: ["Уменьшается производительность", "Повышается скорость обработки", "Происходит автоматическая очистка", "Генерируются новые таблицы"],
-                answer: 0
+                options: ["Повышается скорость обработки", "Уменьшается производительность", "Происходит автоматическая очистка", "Генерируются новые таблицы"],
+                answer: 1
             },
             {
                 question: "Какую команду psql можно использовать для получения списка всех таблиц в базе данных?",
-                options: ["\\dt", "\\ds", "\\du", "\\dp"],
-                answer: 0
-            },
-            {
-                question: "Какой вид представления доступен в схеме information_schema?",
-                options: ["views", "tables", "triggers", "sequences"],
-                answer: 0
+                options: ["\\ds", "\\du", "\\dt", "\\dp"],
+                answer: 2
             },
             {
                 question: "Как определить идентификатор таблицы (OID) без ручного поиска?",
-                options: ["Привести название таблицы к типу regclass", "Выполнить ручной подсчёт записей", "Использовать команду \\d", "Задать особый параметр в конфигурационном файле"],
-                answer: 0
+                options: ["Выполнить ручной подсчёт записей", "Использовать команду \\d", "Задать особый параметр в конфигурационном файле", "Привести название таблицы к типу regclass"],
+                answer: 3
             },
             {
                 question: "Какая особенность связана с использованием типов reg*, связанных с объектом?",
@@ -158,11 +153,6 @@
             {
                 question: "Какая схема содержит наиболее полную информацию о содержимом кластера в PostgreSQL?",
                 options: ["public", "pg_catalog", "information_schema", "pg_temp"],
-                answer: 1
-            },
-            {
-                question: "Какой стандарт SQL предписывает использование схемы information_schema?",
-                options: ["SQL-89", "SQL-2003", "SQL-92", "SQL-2011"],
                 answer: 1
             },
             {
@@ -267,17 +257,17 @@
             },
             {
                 question: "Какой столбец в pg_attribute хранит OID типа данных атрибута?",
-                options: ["atttypid", "attrelid", "attname", "attnum"],
-                answer: 0
+                options: ["attrelid", "attname", "atttypid", "attnum"],
+                answer: 2
             },
             {
                 question: "Какая таблица хранит описание всех объектов PostgreSQL (таблиц, индексов, представлений и др.)?",
-                options: ["pg_class", "pg_attribute", "pg_namespace", "pg_type"],
-                answer: 0
+                options: ["pg_attribute", "pg_class", "pg_class", "pg_namespace", "pg_type"],
+                answer: 1
             },
             {
                 question: "Какая таблица хранит описание столбцов отношений?",
-                options: ["pg_attribute", "pg_class", "pg_namespace", "pg_type"],
+                options: ["pg_attribute", "pg_class", "pg_class", "pg_namespace", "pg_type"],
                 answer: 0
             },
             {
@@ -287,8 +277,8 @@
             },
             {
                 question: "Какая таблица хранит описание типов данных?",
-                options: ["pg_type", "pg_class", "pg_namespace", "pg_attribute"],
-                answer: 0
+                options: [ "pg_class", "pg_namespace", "pg_type", "pg_attribute"],
+                answer: 2
             },
             {
                 question: "Какой столбец в pg_class указывает на владельца объекта?",
@@ -297,8 +287,8 @@
             },
             {
                 question: "Какой столбец в pg_class указывает на пространство имён (схему)?",
-                options: ["relnamespace", "relowner", "relkind", "relpersistence"],
-                answer: 0
+                options: ["relowner", "relkind", "relpersistence", "relnamespace"],
+                answer: 3
             },
             {
                 question: "Какой столбец в pg_class определяет, является ли объект постоянным или временным?",
@@ -352,13 +342,13 @@
             },
             {
                 question: "Какой символ в столбце relkind обозначает представление?",
-                options: ["v", "t", "r", "i"],
-                answer: 0
+                options: ["t", "r", "v", "i"],
+                answer: 2
             },
             {
                 question: "Какой символ в столбце relkind обозначает последовательность?",
-                options: ["S", "s", "Seq", "seq"],
-                answer: 0
+                options: ["s", "S", "Seq", "seq"],
+                answer: 1
             },
             {
                 question: "Какой символ в столбце relkind обозначает индекс?",
@@ -422,8 +412,8 @@
             },
             {
                 question: "Какая таблица хранит описание всех объектов PostgreSQL (таблиц, индексов, представлений и др.)?",
-                options: ["pg_class", "pg_attribute", "pg_namespace", "pg_type"],
-                answer: 0
+                options: ["pg_attribute", "pg_namespace", "pg_class", "pg_type"],
+                answer: 2
             },
             {
                 question: "Какая таблица хранит описание столбцов отношений?",
@@ -432,18 +422,18 @@
             },
             {
                 question: "Какая таблица хранит описание схем?",
-                options: ["pg_namespace", "pg_class", "pg_attribute", "pg_type"],
-                answer: 0
+                options: ["pg_class", "pg_namespace", "pg_attribute", "pg_type"],
+                answer: 1
             },
             {
                 question: "Какая таблица хранит описание типов данных?",
-                options: ["pg_type", "pg_class", "pg_namespace", "pg_attribute"],
-                answer: 0
+                options: ["pg_class", "pg_namespace", "pg_type", "pg_attribute"],
+                answer: 2
             },
             {
                 question: "Какой столбец в pg_class указывает на владельца объекта?",
-                options: ["relowner", "relname", "relnamespace", "relkind"],
-                answer: 0
+                options: ["relname", "relnamespace", "relkind", "relowner"],
+                answer: 3
             },
             {
                 question: "Какой столбец в pg_class указывает на пространство имён (схему)?",

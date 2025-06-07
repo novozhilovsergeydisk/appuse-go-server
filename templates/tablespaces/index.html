@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Табличные пространства</title>
+    <link rel="icon" href="/static/images/favicon.ico" type="image/x-icon">
+
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- <span class="material-icons">home</span> -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#1E40AF',
+                        success: '#10B981',
+                        danger: '#EF4444'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="bg-gray-900 text-white min-h-screen p-8">
+    {{template "navbar.html" .}}
+
+    <div class="max-w-3xl mx-auto">
+        <h1 class="text-2xl md:text-3xl font-bold mb-6 text-center">Табличные пространства</h1>
+
+        <div id="quiz-container" class="space-y-8"></div>
+
+        <button onclick="checkAnswers()"
+            class="mt-8 w-full py-3 bg-primary hover:bg-secondary text-white font-bold rounded-lg transition duration-300">
+            Проверить результат
+        </button>
+
+        <div id="result" class="hidden mt-8 p-6 bg-gray-800 rounded-lg text-center">
+            <h2 class="text-2xl font-bold mb-4">Ваш результат:</h2>
+            <p id="percentage" class="text-4xl text-primary font-mono"></p>
+        </div>
+    </div>
+
+    <script>
+        const quizData = [
+            {
+                question: "Какие два табличных пространства создаются автоматически при инициализации кластера PostgreSQL?",
+                options: ["pg_main и pg_global", "pg_default и pg_global", "pg_base и pg_global", "pg_default и pg_cluster"],
+                answer: 1
+            },
+            {
+                question: "Где хранятся данные, относящиеся ко всему кластеру?",
+                options: ["В pg_default", "В пользовательском ТП", "В pg_global", "В системном каталоге базы данных"],
+                answer: 2
+            },
+            {
+                question: "Что представляет собой табличное пространство в PostgreSQL?",
+                options: ["Схему базы данных", "Физический файл данных", "Указатель на каталог файловой системы", "Логическую группу таблиц"],
+                answer: 2
+            },
+            {
+                question: "Какой параметр используется для задания табличного пространства по умолчанию для временных таблиц?",
+                options: ["default_tablespace", "temp_tablespaces", "tablespace_default", "temporary_tablespace"],
+                answer: 1
+            },
+            {
+                question: "Какая команда создает новое табличное пространство с указанием каталога?",
+                options: ["CREATE TABLESPACE ts LOCATION '/var/lib/postgresql/ts_dir'", "ADD TABLESPACE ts PATH '/var/lib/postgresql/ts_dir'", "NEW TABLESPACE ts AT '/var/lib/postgresql/ts_dir'", "MAKE TABLESPACE ts FOLDER '/var/lib/postgresql/ts_dir'"],
+                answer: 0
+            },
+            {
+                question: "Какой командой можно перенести все объекты из одного табличного пространства в другое?",
+                options: ["ALTER TABLE ALL IN TABLESPACE old_ts SET TABLESPACE new_ts", "MOVE TABLESPACE old_ts TO new_ts", "TRANSFER TABLESPACE old_ts INTO new_ts", "RELOCATE TABLESPACE old_ts TO new_ts"],
+                answer: 0
+            },
+            {
+                question: "Что происходит при физическом перемещении объектов между табличными пространствами?",
+                options: ["Объекты становятся недоступны только на чтение", "Объекты доступны для записи", "Доступ к объектам блокируется полностью", "Блокировка не требуется"],
+                answer: 2
+            },
+            {
+                question: "Как узнать размер табличного пространства?",
+                options: ["SELECT pg_size_pretty(pg_tablespace_size('ts'))", "SHOW TABLESPACE SIZE 'ts'", "TABLESPACE_INFO 'ts'", "GET TABLESPACE SIZE 'ts'"],
+                answer: 0
+            },
+            {
+                question: "Какой командой можно проверить список табличных пространств в psql?",
+                options: ["\dt", "\\db", "\list", "\ds"],
+                answer: 1
+            },
+            {
+                question: "Почему табличное пространство может занимать больше места, чем ожидается от количества пользовательских таблиц?",
+                options: ["Из-за индексов", "Из-за временных таблиц", "Из-за системных объектов каталога", "Из-за логических соединений"],
+                answer: 2
+            },
+            {
+                question: "Можно ли удалить табличное пространство, если оно содержит объекты?",
+                options: ["Да, с помощью CASCADE", "Нет, только если оно пусто", "Да, но только через psql", "Да, если использовать DROP FORCE"],
+                answer: 1
+            },
+            {
+                question: "Как получить список всех баз данных, использующих определённое табличное пространство?",
+                options: ["SELECT datname FROM pg_database WHERE oid IN (SELECT pg_tablespace_databases(oid))", "SELECT dbname FROM pg_tablespace_usage", "SELECT database FROM pg_tablespace_list", "SELECT name FROM pg_tablespace_databases"],
+                answer: 0
+            },
+            {
+                question: "Какой командой можно изменить табличное пространство по умолчанию для базы данных?",
+                options: ["SET DEFAULT TABLESPACE", "ALTER DATABASE ... SET TABLESPACE", "UPDATE DATABASE SET dattablespace", "CHANGE DEFAULT SPACE"],
+                answer: 1
+            },
+            {
+                question: "Как связаны табличные пространства и версии PostgreSQL?",
+                options: ["Пространства зависят от версий", "Каждое табличное пространство имеет подкаталог версии сервера", "Версия не влияет на структуру ТП", "ТП совместимы со всеми версиями"],
+                answer: 1
+            },
+            {
+                question: "Что такое символическая ссылка в каталоге PGDATA/pg_tblspc/ при создании пользовательского ТП?",
+                options: ["Копия файла данных", "Ссылка на каталог базы данных", "Указатель на местоположение пользовательского ТП", "Вспомогательный файл конфигурации"],
+                answer: 2
+            },
+            {
+                question: "Как указать табличное пространство при создании индекса?",
+                options: ["CREATE INDEX t1_id_idx ON t1(id) TABLESPACE pg_default", "CREATE INDEX t1_id_idx FOR t1 USING id TABLESPACE pg_default", "CREATE INDEX t1_id_idx OF t1 TABLESPACE pg_default", "CREATE INDEX t1_id_idx WITH TABLESPACE pg_default"],
+                answer: 0
+            },
+            {
+                question: "Что произойдет, если попытаться удалить табличное пространство, которое используется другими объектами?",
+                options: ["Пространство будет переименовано", "Ошибка: табличное пространство не пусто", "Объекты будут автоматически перемещены", "Удаление выполнится частично"],
+                answer: 1
+            },
+            {
+                question: "Какое табличное пространство является пространством по умолчанию для новых баз данных?",
+                options: ["pg_global", "pg_temp", "pg_default", "pg_main"],
+                answer: 2
+            },
+            {
+                question: "Может ли одна база данных использовать несколько табличных пространств?",
+                options: ["Нет, только одно", "Да, но только системные ТП", "Да, любые ТП", "Только если они находятся на одном диске"],
+                answer: 2
+            },
+            {
+                question: "Как проверить, какие объекты используют определённое табличное пространство в конкретной базе данных?",
+                options: ["SELECT * FROM pg_class WHERE reltablespace = oid", "SELECT * FROM pg_tables WHERE tablespace = 'ts'", "SELECT * FROM pg_objects WHERE spcname = 'ts'", "SELECT * FROM pg_indexes WHERE tablespace = 'ts'"],
+                answer: 0
+            }
+        ];
+
+        function createQuiz() {
+            const container = document.getElementById('quiz-container');
+
+            // Количество вопросов для отображения (можно изменить)
+            const numQuestionsToShow = 10;
+
+            // Создаем копию массива вопросов
+            const shuffledQuestions = [...quizData];
+
+            // Перемешиваем вопросы случайным образом
+            for (let i = shuffledQuestions.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffledQuestions[i], shuffledQuestions[j]] = [shuffledQuestions[j], shuffledQuestions[i]];
+            }
+
+            // Выбираем нужное количество вопросов (или все, если их меньше)
+            const selectedQuestions = shuffledQuestions.slice(0, Math.min(numQuestionsToShow, shuffledQuestions.length));
+
+            // Сохраняем выбранные вопросы для проверки ответов
+            window.selectedQuizData = selectedQuestions;
+
+            // Отображаем выбранные вопросы
+            selectedQuestions.forEach((item, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = "bg-gray-800 p-6 rounded-lg";
+                questionDiv.innerHTML = `
+                <h2 class="text-xl font-semibold mb-4">${index + 1}. ${item.question}</h2>
+                <div class="space-y-2">
+                    ${item.options.map((option, i) => `
+                        <label class="flex items-center space-x-3 p-2 rounded-md hover:bg-gray-700 answer-label">
+                            <input type="radio" name="q${index}" value="${i}" class="w-4 h-4 text-primary focus:ring-primary">
+                            <span>${option}</span>
+                        </label>
+                    `).join('')}
+                </div>
+            `;
+                container.appendChild(questionDiv);
+            });
+        }
+
+        function checkAnswers() {
+            let correct = 0;
+            let hasUnanswered = false;
+            const resultDiv = document.getElementById('result');
+            const percentage = document.getElementById('percentage');
+
+            // Получаем выбранные вопросы из глобальной переменной
+            const selectedQuestions = window.selectedQuizData || [];
+
+            document.querySelectorAll('.answer-label').forEach(label => {
+                label.classList.remove('bg-green-900/20', 'bg-red-900/20', 'border', 'border-success', 'border-danger');
+            });
+
+            for (let i = 0; i < selectedQuestions.length; i++) {
+                if (!document.querySelector(`input[name="q${i}"]:checked`)) {
+                    hasUnanswered = true;
+                    break;
+                }
+            }
+
+            if (hasUnanswered) {
+                alert('Пожалуйста, ответьте на все вопросы!');
+                return;
+            }
+
+            selectedQuestions.forEach((item, index) => {
+                const selected = document.querySelector(`input[name="q${index}"]:checked`);
+                if (selected) {
+                    const selectedLabel = selected.closest('.answer-label');
+                    const correctLabel =
+                        document.querySelector(`input[name="q${index}"][value="${item.answer}"]`).closest('.answer-label');
+                    if (parseInt(selected.value) === item.answer) {
+                        correctLabel.classList.add('bg-green-900/20', 'border', 'border-success');
+                        correct++;
+                    } else {
+                        selectedLabel.classList.add('bg-red-900/20', 'border', 'border-danger');
+                        correctLabel.classList.add('bg-green-900/20', 'border', 'border-success');
+                    }
+                }
+            });
+
+            const percent = (correct / selectedQuestions.length) * 100;
+            percentage.textContent = `${percent.toFixed(1)}%`;
+            resultDiv.classList.remove('hidden');
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        }
+
+        window.onload = createQuiz;
+    </script>
+
+    {{template "footer.html" .}}
+</body>
+
+</html>

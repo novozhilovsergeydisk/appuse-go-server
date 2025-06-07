@@ -22,6 +22,7 @@ func main() {
 	mux.HandleFunc("/buffer_cache_log", handlers.BufferCacheLog)
 	mux.HandleFunc("/databases_schemas", handlers.DatabasesSchemas)
 	mux.HandleFunc("/system_catalog", handlers.SystemCatalog)
+	mux.HandleFunc("/tablespaces", handlers.Tablespaces)
 
 	// Настройка обработки статических файлов
 	staticDir := "static"
