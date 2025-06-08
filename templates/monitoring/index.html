@@ -51,223 +51,153 @@
     <script>
         const quizData = [
             {
-                question: "Какое представление отслеживает статистику по слотам репликации в PostgreSQL?",
-                options: ["pg_stat_database", "pg_stat_replication_slots", "pg_stat_wal_receiver", "pg_stat_subscription"],
+                question: "Какой параметр PostgreSQL отвечает за отображение текущего состояния процесса в его имени?",
+                options: ["update_process_title", "cluster_name", "track_activities", "stats_fetch_consistency"],
+                answer: 0
+            },
+            {
+                question: "Какой параметр позволяет отличать экземпляр PostgreSQL в списке процессов?",
+                options: ["update_process_title", "cluster_name", "track_activities", "track_io_timing"],
                 answer: 1
             },
             {
-                question: "Что показывает столбец 'spill_txns' в представлении pg_stat_replication_slots?",
-                options: ["Количество активных подключений", "Число транзакций, вытесненных на диск при логическом декодировании", "Количество WAL-файлов", "Число ошибок репликации"],
-                answer: 1
-            },
-            {
-                question: "Какой параметр конфигурации отвечает за сбор статистики по таблицам и индексам?",
-                options: ["track_activities", "track_counts", "log_temp_files", "track_io_timing"],
-                answer: 1
-            },
-            {
-                question: "Какой инструмент позволяет выполнять сложный анализ журналов PostgreSQL?",
-                options: ["check_postgres", "Nagios", "pgBadger", "Zabbix"],
+                question: "Какая команда Unix используется для просмотра информации о дисковом пространстве?",
+                options: ["top", "vmstat", "df", "sar"],
                 answer: 2
             },
             {
-                question: "Для какого процесса используется представление pg_stat_progress_vacuum?",
-                options: ["Анализ таблицы", "Создание индекса", "Очистка (VACUUM)", "Копирование данных"],
-                answer: 2
-            },
-            {
-                question: "Какой столбец в pg_stat_database указывает на количество строк, удалённых запросами?",
-                options: ["tup_deleted", "n_tup_del", "xact_rollback", "deadlocks"],
-                answer: 0
-            },
-            {
-                question: "Что означает значение NULL в столбце 'reply_time' у ведомых серверов?",
-                options: ["Сервер работает некорректно", "Соединение потеряно или данные ещё не получены", "Ошибка в настройке репликации", "Сервер не зарегистрирован"],
-                answer: 1
-            },
-            {
-                question: "Какой параметр необходимо включить, чтобы собирать данные о времени выполнения операций fsync?",
-                options: ["track_io_timing", "log_temp_files", "track_counts", "checkpoint_segments"],
-                answer: 0
-            },
-            {
-                question: "Какое представление содержит информацию о количестве критических ошибок в базе данных?",
-                options: ["pg_stat_database", "pg_stat_database_conflicts", "pg_stat_bgwriter", "pg_stat_archiver"],
-                answer: 0
-            },
-            {
-                question: "Какой из следующих вариантов указывает на количество записей, которые были исключены командой COPY из-за условия WHERE?",
-                options: ["tuples_processed", "tuples_excluded", "tup_returned", "tup_fetched"],
-                answer: 1
-            },
-            {
-                question: "Какой столбец в pg_stat_all_tables отражает оценочное число мёртвых строк в таблице?",
-                options: ["n_live_tup", "n_dead_tup", "n_tup_upd", "n_mod_since_analyze"],
-                answer: 1
-            },
-            {
-                question: "Какой из перечисленных процессов может быть источником большого количества fsync со стороны клиентских процессов?",
-                options: ["Неправильная настройка shared_buffers", "Слишком маленький work_mem", "Высокая степень параллелизма", "Использование SSD вместо HDD"],
-                answer: 0
-            },
-            {
-                question: "Какое представление используется для отслеживания хода выполнения команды CLUSTER?",
-                options: ["pg_stat_progress_create_index", "pg_stat_progress_vacuum", "pg_stat_progress_cluster", "pg_stat_progress_copy"],
-                answer: 2
-            },
-            {
-                question: "Что описывает параметр stats_fetch_consistency при работе с накопительной статистикой?",
-                options: ["Время обновления статистики", "Уровень детализации статистики", "Степень согласованности выборки", "Тип собираемых метрик"],
-                answer: 2
-            },
-            {
-                question: "Какое представление показывает общую статистику по количеству активных сеансов и их состоянию?",
-                options: ["pg_stat_database", "pg_stat_sessions", "pg_stat_user_functions", "pg_stat_progress_copy"],
-                answer: 0
-            },
-            {
-                question: "Какой из следующих столбцов отражает объём данных, записанных во временные файлы?",
-                options: ["temp_bytes", "temp_files", "deadlocks", "checksum_failures"],
-                answer: 0
-            },
-            {
-                question: "Какое представление содержит данные о количестве ошибок, возникших при применении изменений подпиской?",
-                options: ["pg_stat_subscription", "pg_stat_subscription_stats", "pg_stat_replication", "pg_stat_wal_receiver"],
-                answer: 1
-            },
-            {
-                question: "Какое представление можно использовать для анализа использования буферов в SLRU-кеше?",
-                options: ["pg_stat_io", "pg_stat_slru", "pg_stat_bgwriter", "pg_stat_database"],
-                answer: 1
-            },
-            {
-                question: "Какой из следующих инструментов позволяет отправлять уведомления в Nagios при появлении важных сообщений в журнале?",
-                options: ["pgBadger", "check_postgres", "Zabbix", "OPM"],
-                answer: 1
-            },
-            {
-                question: "Какой из следующих параметров влияет на частоту обновления статистики в представлениях?",
-                options: ["track_io_timing", "track_activities", "PGSTAT_MIN_INTERVAL", "stats_fetch_consistency"],
-                answer: 2
-            },
-            {
-                question: "Какой из следующих столбцов отражает количество «живых» строк, выбранных при сканировании индексов?",
-                options: ["tup_returned", "tup_fetched", "idx_tup_read", "idx_tup_fetch"],
+                question: "Какая команда Unix используется для просмотра размера базы данных из ОС?",
+                options: ["df", "iostat", "sar", "du"],
                 answer: 3
             },
             {
-                question: "Какой столбец в pg_stat_database_conflicts считает количество запросов, отменённых из-за взаимоблокировок?",
-                options: ["confl_lock", "confl_snapshot", "confl_deadlock", "confl_bufferpin"],
-                answer: 2
+                question: "Какой параметр включает мониторинг текущих команд в PostgreSQL?",
+                options: ["track_activities", "track_counts", "track_functions", "track_io_timing"],
+                answer: 0
             },
             {
-                question: "Какое поле в pg_stat_wal_receiver показывает последнюю позицию в WAL, уже сброшенную на диск?",
-                options: ["received_lsn", "flushed_lsn", "latest_end_lsn", "write_lsn"],
+                question: "Какой параметр включает сбор статистики по обращениям к таблицам и индексам?",
+                options: ["track_activities", "track_counts", "track_functions", "track_wal_io_timing"],
                 answer: 1
             },
             {
-                question: "Какой параметр отвечает за ограничение длины строки запроса в pg_stat_statements?",
-                options: ["track_activity_query_size", "log_min_duration_statement", "statement_timeout", "work_mem"],
+                question: "Какой параметр включает мониторинг времени чтения и записи блоков в PostgreSQL?",
+                options: ["track_io_timing", "track_wal_io_timing", "track_activities", "track_counts"],
                 answer: 0
             },
             {
-                question: "Какой из следующих столбцов отражает количество запрошенных операций предвыборки, ещё не завершённых?",
-                options: ["block_distance", "io_depth", "skip_new", "skip_init"],
+                question: "Какой параметр управляет уровнем кеширования статистики в PostgreSQL?",
+                options: ["track_activities", "track_counts", "stats_fetch_consistency", "track_io_timing"],
+                answer: 2
+            },
+            {
+                question: "Какое значение параметра stats_fetch_consistency обеспечивает компромисс между согласованностью и эффективностью?",
+                options: ["none", "cache", "snapshot", "default"],
                 answer: 1
             },
             {
-                question: "Какое представление содержит данные о количестве успешных архиваций WAL-файлов?",
-                options: ["pg_stat_archiver", "pg_stat_wal", "pg_stat_replication", "pg_stat_bgwriter"],
+                question: "Какой представление показывает статистику обращений к таблицам в терминах строк?",
+                options: ["pg_stat_all_tables", "pg_statio_all_tables", "pg_stat_all_indexes", "pg_stat_database"],
                 answer: 0
             },
             {
-                question: "Какой из следующих столбцов отражает время, затраченное на операции расширения отношений?",
-                options: ["extend_time", "read_time", "write_time", "fsync_time"],
-                answer: 0
+                question: "Какой представление показывает статистику обращений к таблицам в терминах страниц?",
+                options: ["pg_stat_all_tables", "pg_statio_all_tables", "pg_stat_all_indexes", "pg_stat_database"],
+                answer: 1
             },
             {
-                question: "Какое значение принимает состояние 'sync_state' у синхронного ведомого сервера?",
-                options: ["async", "potential", "sync", "quorum"],
-                answer: 2
-            },
-            {
-                question: "Какой из следующих процессов может вызвать большое количество fsync со стороны клиентских процессов?",
-                options: ["Низкое значение checkpoint_segments", "Маленькое значение work_mem", "Неверная настройка shared_buffers", "Высокий уровень параллелизма"],
-                answer: 2
-            },
-            {
-                question: "Какой из следующих параметров позволяет гарантировать сохранение данных в постоянном хранилище?",
-                options: ["synchronous_commit", "checkpoint_segments", "shared_buffers", "work_mem"],
-                answer: 0
-            },
-            {
-                question: "Какой столбец в pg_stat_all_indexes отражает количество элементов индекса, возвращаемых при сканированиях?",
-                options: ["idx_tup_fetch", "idx_blks_hit", "idx_blks_read", "idx_tup_read"],
+                question: "Какое представление используется для получения общей статистики по базе данных?",
+                options: ["pg_stat_all_tables", "pg_statio_all_tables", "pg_stat_all_indexes", "pg_stat_database"],
                 answer: 3
             },
             {
-                question: "Какой из следующих столбцов отражает количество блоков, не выбранных предварительно из-за того, что они уже находились в пуле буферов?",
-                options: ["skip_init", "skip_new", "skip_fpw", "skip_rep"],
+                question: "Какой столбец в pg_stat_database показывает количество обслуживающих процессов, подключенных к БД?",
+                options: ["numbackends", "xact_commit", "tup_returned", "temp_files"],
                 answer: 0
             },
             {
-                question: "Какой из следующих параметров влияет на частоту создания контрольных точек?",
-                options: ["checkpoint_segments", "checkpoint_timeout", "max_wal_size", "min_wal_size"],
+                question: "Какое представление содержит информацию о текущих активностях всех процессов PostgreSQL?",
+                options: ["pg_stat_all_tables", "pg_stat_activity", "pg_stat_all_indexes", "pg_stat_database"],
                 answer: 1
             },
             {
-                question: "Какое представление используется для анализа использования буферов фоновым процессом записи?",
-                options: ["pg_stat_io", "pg_stat_slru", "pg_stat_bgwriter", "pg_stat_database"],
+                question: "Какой параметр нужно включить для работы представления pg_stat_activity?",
+                options: ["track_counts", "track_io_timing", "track_wal_io_timing", "track_activities"],
+                answer: 3
+            },
+            {
+                question: "Какой функцией можно завершить блокирующий сеанс вручную?",
+                options: ["pg_cancel_backend", "pg_terminate_backend", "pg_reload_conf", "pg_stat_reset"],
+                answer: 1
+            },
+            {
+                question: "Какой представление используется для отслеживания выполнения команды ANALYZE?",
+                options: ["pg_stat_progress_analyze", "pg_stat_progress_create_index", "pg_stat_progress_vacuum", "pg_stat_progress_copy"],
+                answer: 0
+            },
+            {
+                question: "Какой представление используется для отслеживания выполнения команды CREATE INDEX?",
+                options: ["pg_stat_progress_analyze", "pg_stat_progress_create_index", "pg_stat_progress_vacuum", "pg_stat_progress_copy"],
+                answer: 1
+            },
+            {
+                question: "Какой представление используется для отслеживания выполнения команды VACUUM?",
+                options: ["pg_stat_progress_analyze", "pg_stat_progress_create_index", "pg_stat_progress_vacuum", "pg_stat_progress_copy"],
                 answer: 2
             },
             {
-                question: "Какой из следующих столбцов отражает количество сеансов, прерванных из-за потери соединения с клиентом?",
-                options: ["sessions_abandoned", "sessions_fatal", "sessions_killed", "sessions_total"],
-                answer: 0
-            },
-            {
-                question: "Какой из следующих столбцов отражает количество попаданий в кеш при чтении индексов?",
-                options: ["idx_blks_hit", "heap_blks_hit", "heap_blks_read", "idx_blks_read"],
+                question: "Какой представление используется для отслеживания выполнения команды COPY?",
+                options: ["pg_stat_progress_analyze", "pg_stat_progress_create_index", "pg_stat_progress_vacuum", "pg_stat_progress_copy"],
                 answer: 3
             },
             {
-                question: "Какой из следующих столбцов отражает количество ошибок контрольных сумм в страницах данных?",
-                options: ["checksum_last_failure", "checksum_failures", "deadlocks", "conflicts"],
-                answer: 1
-            },
-            {
-                question: "Какой из следующих столбцов отражает количество блоков, прочитанных при последовательном сканировании таблицы?",
-                options: ["heap_blks_read", "heap_blks_hit", "idx_blks_read", "toast_blks_read"],
+                question: "Какой параметр позволяет принудительно завершать сеансы, в которых транзакция простаивает слишком долго?",
+                options: ["idle_in_transaction_session_timeout", "track_activities", "log_min_duration_statement", "stats_fetch_consistency"],
                 answer: 0
             },
             {
-                question: "Какой из следующих столбцов отражает количество транзакций, для которых был выполнен откат?",
-                options: ["xact_commit", "xact_rollback", "tup_inserted", "tup_updated"],
+                question: "Какой параметр определяет приемник журнала сообщений сервера?",
+                options: ["log_destination", "logging_collector", "log_min_messages", "log_checkpoints"],
+                answer: 0
+            },
+            {
+                question: "Какой параметр включает коллектор сообщений PostgreSQL?",
+                options: ["log_destination", "logging_collector", "log_min_messages", "log_checkpoints"],
                 answer: 1
             },
             {
-                question: "Какой из следующих столбцов отражает количество запросов, отменённых из-за устаревших снимков данных?",
-                options: ["confl_lock", "confl_snapshot", "confl_deadlock", "confl_bufferpin"],
-                answer: 1
-            },
-            {
-                question: "Какой из следующих столбцов отражает количество блоков, проверенных на наличие в SLRU-кеше?",
-                options: ["blks_read", "blks_written", "truncates", "blks_exists"],
-                answer: 3
-            },
-            {
-                question: "Какой из следующих столбцов отражает количество операций расширения отношений?",
-                options: ["reads", "writes", "extends", "fsyncs"],
+                question: "Какой параметр задает маску имени файла для ротации журналов?",
+                options: ["log_rotation_age", "log_truncate_on_rotation", "log_filename", "log_rotation_size"],
                 answer: 2
             },
             {
-                question: "Какой из следующих столбцов отражает количество грязных буферов, записанных при выполнении контрольной точки?",
-                options: ["buffers_clean", "buffers_backend", "buffers_alloc", "buffers_checkpoint"],
+                question: "Какой параметр задает время переключения на следующий файл журнала в минутах?",
+                options: ["log_rotation_age", "log_truncate_on_rotation", "log_filename", "log_rotation_size"],
+                answer: 0
+            },
+            {
+                question: "Какой параметр позволяет перезаписывать уже существующие файлы при ротации?",
+                options: ["log_rotation_age", "log_truncate_on_rotation", "log_filename", "log_rotation_size"],
+                answer: 1
+            },
+            {
+                question: "Какой сторонний инструмент часто используется для анализа журналов PostgreSQL?",
+                options: ["pgBadger", "Munin", "Cacti", "Zabbix"],
                 answer: 3
             },
             {
-                question: "Какой из следующих столбцов отражает количество блоков, не выбранных предварительно, потому что они должны инициализироваться нулями?",
-                options: ["skip_init", "skip_new", "skip_fpw", "skip_rep"],
+                question: "Какое расширение PostgreSQL предоставляет статистику по версиям строк?",
+                options: ["pg_stat_statements", "pgstattuple", "pg_buffercache", "pg_qualstats"],
+                answer: 2
+            },
+            {
+                question: "Какое расширение PostgreSQL предоставляет статистику по запросам?",
+                options: ["pgstattuple", "pg_buffercache", "pg_stat_statements", "pg_qualstats"],
+                answer: 2
+            },
+            {
+                question: "Какой параметр включает вывод всех SQL-команд в журнал?",
+                options: ["log_statement", "log_min_duration_statement", "log_duration", "log_checkpoints"],
                 answer: 0
             }
         ];
