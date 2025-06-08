@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Управление доступом</title>
+    <link rel="icon" href="/static/images/favicon.ico" type="image/x-icon">
+
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- <span class="material-icons">home</span> -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#1E40AF',
+                        success: '#10B981',
+                        danger: '#EF4444'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="bg-gray-900 text-white min-h-screen p-8">
+    {{template "navbar.html" .}}
+
+    <div class="max-w-3xl mx-auto">
+        <h1 class="text-2xl md:text-3xl font-bold mb-6 text-center">Управление доступом</h1>
+
+        <div id="quiz-container" class="space-y-8"></div>
+
+        <button onclick="checkAnswers()"
+            class="mt-8 w-full py-3 bg-primary hover:bg-secondary text-white font-bold rounded-lg transition duration-300">
+            Проверить результат
+        </button>
+
+        <div id="result" class="hidden mt-8 p-6 bg-gray-800 rounded-lg text-center">
+            <h2 class="text-2xl font-bold mb-4">Ваш результат:</h2>
+            <p id="percentage" class="text-4xl text-primary font-mono"></p>
+        </div>
+    </div>
+
+    <script>
+        const quizData = [
+    {
+        question: "Что представляет собой роль в PostgreSQL?",
+        options: ["Пользователь ОС", "Группа пользователей", "Объект базы данных", "Пользователь СУБД"],
+        answer: 3
+    },
+    {
+        question: "Какой атрибут роли позволяет ей подключаться к серверу баз данных?",
+        options: ["CREATEROLE", "LOGIN", "SUPERUSER", "CREATEDB"],
+        answer: 1
+    },
+    {
+        question: "Может ли роль быть одновременно пользователем и группой?",
+        options: ["Нет, это разные понятия", "Только если она суперпользователь", "Только для системных ролей", "Да, зависит от настроек"],
+        answer: 3
+    },
+    {
+        question: "Какой командой используется для создания новой роли в PostgreSQL?",
+        options: ["CREATE USER", "CREATE GROUP", "CREATE ROLE", "ADD ROLE"],
+        answer: 2
+    },
+    {
+        question: "Какой атрибут определяет возможность роли создавать новые базы данных?",
+        options: ["CREATEDB", "CREATE DB", "NEWDB", "CREATE DATABASE"],
+        answer: 0
+    },
+    {
+        question: "Что означает атрибут SUPERUSER у роли?",
+        options: ["Роль может создавать другие роли", "Роль имеет все права без проверок", "Роль может подключаться к БД", "Роль является администратором системы"],
+        answer: 1
+    },
+    {
+        question: "Какая команда выводит список существующих ролей в psql?",
+        options: ["\\dl", "\\du", "\\dr", "\\roles"],
+        answer: 1
+    },
+    {
+        question: "Какое свойство роли определяет возможность создания других ролей?",
+        options: ["CREATEROLE", "CREATE ROLE", "ADMIN", "ROLE_ADMIN"],
+        answer: 0
+    },
+    {
+        question: "Какой атрибут необходимо указать для роли, чтобы она могла выполнять репликацию?",
+        options: ["REPLICATION", "STREAMING", "CLUSTER", "SYNC"],
+        answer: 0
+    },
+    {
+        question: "Какая команда изменяет атрибуты существующей роли?",
+        options: ["UPDATE ROLE", "MODIFY ROLE", "CHANGE ROLE", "ALTER ROLE"],
+        answer: 3
+    },
+    {
+        question: "Какой атрибут отключает наследование прав при членстве в другой роли?",
+        options: [ "NOPERMISSION", "NOINHERIT", "NOACCESS", "NOGRANT"],
+        answer: 1
+    },
+    {
+        question: "Какой атрибут позволяет роли игнорировать политики защиты на уровне строк (RLS)?",
+        options: ["IGNORE_RLS", "SKIP_RLS", "BYPASSRLS", "NO_RLS"],
+        answer: 0
+    },
+    {
+        question: "Какой метод аутентификации позволяет любому пользователю подключиться без проверки?",
+        options: ["trust", "peer", "ident", "password"],
+        answer: 0
+    },
+    {
+        question: "Какой файл определяет правила подключения клиентов к PostgreSQL?",
+        options: ["pg_config.conf", "postgresql.conf", "pg_hba.conf", "auth.conf"],
+        answer: 2
+    },
+    {
+        question: "Какой метод аутентификации использует идентификацию через ОС?",
+        options: ["peer", "ident", "system", "local"],
+        answer: 0
+    },
+    {
+        question: "Какой атрибут ограничивает количество одновременных соединений роли?",
+        options: ["MAX_CONNECTIONS", "LIMIT CONNECTIONS", "CONNECTION LIMIT", "CONN_LIMIT"],
+        answer: 2
+    },
+    {
+        question: "Какой командой можно удалить роль в PostgreSQL?",
+        options: ["DELETE ROLE", "REMOVE ROLE", "DROP ROLE", "TRUNCATE ROLE"],
+        answer: 2
+    },
+    {
+        question: "Что означает псевдороль public?",
+        options: ["Все роли автоматически входят в нее", "Это гостевой доступ", "Это суперпользователь", "Это группа администраторов"],
+        answer: 0
+    },
+    {
+        question: "Какой предопределённой роли разрешено читать все данные таблиц?",
+        options: ["pg_read_all_data", "pg_all_access", "pg_superuser", "pg_read_all"],
+        answer: 0
+    },
+    {
+        question: "Какой атрибут определяет срок действия пароля роли?",
+        options: ["EXPIRES", "VALID UNTIL", "PASSWORD_EXPIRE", "TILL"],
+        answer: 1
+    },
+    {
+        question: "Какой привилегией обладает владелец таблицы по умолчанию?",
+        options: ["SELECT", "INSERT", "UPDATE", "Все вышеперечисленное"],
+        answer: 3
+    },
+    {
+        question: "Какой командой предоставляются права другим ролям?",
+        options: ["GIVE", "SHARE", "GRANT", "ALLOW"],
+        answer: 2
+    },
+    {
+        question: "Какой командой отзываются права у роли?",
+        options: ["REVOKE", "DENY", "UNGRANT", "CANCEL"],
+        answer: 0
+    },
+    {
+        question: "Какой привилегией обладает роль, которая может выполнять функции мониторинга?",
+        options: ["pg_monitor", "pg_admin", "pg_stat", "pg_super"],
+        answer: 0
+    },
+    {
+        question: "Какой параметр позволяет задать путь поиска схем для роли?",
+        options: ["SET PATH", "SET SCHEMA_PATH", "SET search_path", "SET schema_search"],
+        answer: 2
+    },
+    {
+        question: "Какой командой можно проверить текущие права роли на объект?",
+        options: ["SHOW PRIVILEGES", "\\dp", "CHECK PRIVILEGES", "PRIVILEGE LIST"],
+        answer: 1
+    },
+    {
+        question: "Какой атрибут роли указывает на возможность выполнения программ на сервере?",
+        options: ["EXECUTE_SERVER", "SERVER_EXEC", "pg_execute_server_program", "RUN_SERVER"],
+        answer: 2
+    },
+    {
+        question: "Какой командой можно установить конфигурационные параметры для роли?",
+        options: ["SET CONFIG", "ALTER CONFIG", "ALTER ROLE SET", "CONFIG ROLE"],
+        answer: 2
+    },
+    {
+        question: "Какой предопределённой роли разрешено выполнять CHECKPOINT?",
+        options: ["pg_checkpoint", "pg_admin", "pg_superuser", "pg_backup"],
+        answer: 0
+    },
+    {
+        question: "Какой командой можно просмотреть список всех ролей в базе данных?",
+        options: ["SELECT * FROM pg_users", "SELECT * FROM pg_roles", "SELECT * FROM pg_authid", "SELECT * FROM pg_group"],
+        answer: 1
+    },
+    {
+        question: "Какой атрибут роли запрещает наследование прав по умолчанию?",
+        options: ["NOINHERIT", "NOPERMISSION", "NOACCESS", "NOGRANT"],
+        answer: 0
+    },
+    {
+        question: "Какой командой можно добавить одну роль в состав другой?",
+        options: ["JOIN", "INCLUDE", "GRANT", "ADD"],
+        answer: 2
+    },
+    {
+        question: "Какой командой можно отозвать членство роли в другой?",
+        options: ["REVOKE", "REMOVE", "UNJOIN", "UNGROUP"],
+        answer: 0
+    },
+    {
+        question: "Какой предопределённой роли разрешено выполнять администрирование статистики?",
+        options: ["pg_read_all_stats", "pg_stat_admin", "pg_superuser", "pg_monitor"],
+        answer: 0
+    },
+    {
+        question: "Какой командой можно выдать право на использование схемы?",
+        options: ["USE SCHEMA", "USAGE SCHEMA", "GRANT USAGE ON SCHEMA", "PERMIT USAGE"],
+        answer: 2
+    },
+    {
+        question: "Какой атрибут роли позволяет отправлять сигналы другим процессам?",
+        options: ["pg_kill_process", "pg_send_signal", "pg_backend_signal", "pg_signal_backend"],
+        answer: 3
+    },
+    {
+        question: "Какой метод аутентификации требует совпадения имени пользователя ОС и роли?",
+        options: ["ident", "system", "local", "peer"],
+        answer: 3
+    },
+    {
+        question: "Какой файл используется для настройки отображения пользователей ОС на роли PostgreSQL?",
+        options: ["pg_ident.conf", "pg_hba.conf", "pg_map.conf", "pg_usermap.conf"],
+        answer: 0
+    },
+    {
+        question: "Какой командой можно изменить пароль роли?",
+        options: ["SET PASSWORD", "ALTER ROLE ... PASSWORD", "RESET PASSWORD", "CHANGE PASSWORD"],
+        answer: 1
+    },
+    {
+        question: "Какой командой можно выдать привилегию SELECT на таблицу?",
+        options: ["GRANT SELECT", "PERMIT SELECT", "ENABLE SELECT", "ALLOW SELECT"],
+        answer: 0
+    },
+    {
+        question: "Какой командой можно отозвать привилегию INSERT у роли?",
+        options: ["DISABLE INSERT", "REMOVE INSERT", "FORBID INSERT", "REVOKE INSERT"],
+        answer: 3
+    },
+    {
+        question: "Какой командой можно установить привилегии по умолчанию на новые функции?",
+        options: ["ALTER DEFAULT PRIVILEGES", "DEFAULT GRANT", "SET DEFAULT PRIVILEGES", "NEW PRIVILEGES"],
+        answer: 0
+    },
+    {
+        question: "Какой командой можно просмотреть текущие параметры безопасности роли?",
+        options: ["SHOW ALL", "\\dv", "\\c", "\\conninfo"],
+        answer: 0
+    },
+    {
+        question: "Какой командой можно выдать роль права на чтение всех файлов сервера?",
+        options: ["READ SERVER FILES", "PERMIT FILE READ", "USE SERVER FILES", "GRANT pg_read_server_files"],
+        answer: 3
+    },
+    {
+        question: "Какой командой можно дать роль возможность записи в файлы сервера?",
+        options: ["GRANT pg_write_server_files", "WRITE SERVER FILES", "PERMIT FILE WRITE", "USE SERVER FILES"],
+        answer: 0
+    },
+    {
+        question: "Какой командой можно включить роль в состав группы?",
+        options: ["JOIN GROUP", "ADD TO GROUP", "GRANT GROUP", "INCLUDE IN GROUP"],
+        answer: 2
+    },
+    {
+        question: "Какой командой можно выдать право на создание последовательностей?",
+        options: ["GRANT CREATE SEQUENCE", "GRANT USAGE", "GRANT CREATE", "GRANT SEQUENCE"],
+        answer: 2
+    },
+    {
+        question: "Какой командой можно выдать право на использование табличного пространства?",
+        options: ["GRANT USAGE", "GRANT CREATE", "GRANT TABLESPACE", "GRANT USE"],
+        answer: 1
+    },
+    {
+        question: "Какой командой можно выдать право на создание временных таблиц?",
+        options: ["GRANT TEMPORARY", "GRANT TEMP", "GRANT CREATE TEMP", "GRANT CREATE TEMPORARY"],
+        answer: 0
+    },
+    {
+        question: "Какой командой можно выдать право на вызов функции?",
+        options: ["GRANT CALL", "GRANT EXECUTE", "GRANT RUN", "GRANT FUNCTION"],
+        answer: 1
+    },
+    {
+        question: "Какой командой можно выдать право на управление резервными подключениями?",
+        options: ["GRANT RESERVED CONNECT", "GRANT RESERVE CONNECT", "GRANT pg_use_reserved_connections", "GRANT USE RESERVES"],
+        answer: 2
+    },
+    {
+        question: "Какой командой можно выдать право на подписку на репликацию?",
+        options: ["GRANT SUBSCRIBE", "GRANT REPLICATION SUB", "GRANT CREATE SUBSCRIPTION", "GRANT pg_create_subscription"],
+        answer: 3
+    },
+    {
+        question: "Какой командой можно выдать право на запуск внешних программ на сервере?",
+        options: ["GRANT pg_execute_server_program", "GRANT EXECUTE PROGRAM", "GRANT RUN PROGRAM", "GRANT EXECUTE EXTERNAL"],
+        answer: 0
+    },
+    {
+        question: "Какой командой можно выдать право на чтение конфигурационных переменных?",
+        options: ["GRANT pg_read_all_settings", "GRANT READ SETTINGS", "GRANT VIEW SETTINGS", "GRANT SHOW SETTINGS"],
+        answer: 0
+    }
+];
+
+        function createQuiz() {
+            const container = document.getElementById('quiz-container');
+
+            // Количество вопросов для отображения (можно изменить)
+            const numQuestionsToShow = 10;
+
+            // Создаем копию массива вопросов
+            const shuffledQuestions = [...quizData];
+
+            // Перемешиваем вопросы случайным образом
+            for (let i = shuffledQuestions.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffledQuestions[i], shuffledQuestions[j]] = [shuffledQuestions[j], shuffledQuestions[i]];
+            }
+
+            // Выбираем нужное количество вопросов (или все, если их меньше)
+            const selectedQuestions = shuffledQuestions.slice(0, Math.min(numQuestionsToShow, shuffledQuestions.length));
+
+            // Сохраняем выбранные вопросы для проверки ответов
+            window.selectedQuizData = selectedQuestions;
+
+            // Отображаем выбранные вопросы
+            selectedQuestions.forEach((item, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = "bg-gray-800 p-6 rounded-lg";
+                questionDiv.innerHTML = `
+                <h2 class="text-xl font-semibold mb-4">${index + 1}. ${item.question}</h2>
+                <div class="space-y-2">
+                    ${item.options.map((option, i) => `
+                        <label class="flex items-center space-x-3 p-2 rounded-md hover:bg-gray-700 answer-label">
+                            <input type="radio" name="q${index}" value="${i}" class="w-4 h-4 text-primary focus:ring-primary">
+                            <span>${option}</span>
+                        </label>
+                    `).join('')}
+                </div>
+            `;
+                container.appendChild(questionDiv);
+            });
+        }
+
+        function checkAnswers() {
+            let correct = 0;
+            let hasUnanswered = false;
+            const resultDiv = document.getElementById('result');
+            const percentage = document.getElementById('percentage');
+
+            // Получаем выбранные вопросы из глобальной переменной
+            const selectedQuestions = window.selectedQuizData || [];
+
+            document.querySelectorAll('.answer-label').forEach(label => {
+                label.classList.remove('bg-green-900/20', 'bg-red-900/20', 'border', 'border-success', 'border-danger');
+            });
+
+            for (let i = 0; i < selectedQuestions.length; i++) {
+                if (!document.querySelector(`input[name="q${i}"]:checked`)) {
+                    hasUnanswered = true;
+                    break;
+                }
+            }
+
+            if (hasUnanswered) {
+                alert('Пожалуйста, ответьте на все вопросы!');
+                return;
+            }
+
+            selectedQuestions.forEach((item, index) => {
+                const selected = document.querySelector(`input[name="q${index}"]:checked`);
+                if (selected) {
+                    const selectedLabel = selected.closest('.answer-label');
+                    const correctLabel = document.querySelector(`input[name="q${index}"][value="${item.answer}"]`).closest('.answer-label');
+                    if (parseInt(selected.value) === item.answer) {
+                        correctLabel.classList.add('bg-green-900/20', 'border', 'border-success');
+                        correct++;
+                    } else {
+                        selectedLabel.classList.add('bg-red-900/20', 'border', 'border-danger');
+                        correctLabel.classList.add('bg-green-900/20', 'border', 'border-success');
+                    }
+                }
+            });
+
+            const percent = (correct / selectedQuestions.length) * 100;
+            percentage.textContent = `${percent.toFixed(1)}%`;
+            resultDiv.classList.remove('hidden');
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        }
+
+        window.onload = createQuiz;
+</script>
+
+{{template "footer.html" .}}
+</body>
+
+</html>

@@ -25,6 +25,7 @@ func main() {
 	mux.HandleFunc("/tablespaces", handlers.Tablespaces)
 	mux.HandleFunc("/low_level", handlers.LowLevel)
 	mux.HandleFunc("/monitoring", handlers.Monitoring)
+	mux.HandleFunc("/access_control", handlers.AccessControl)
 
 	// Настройка обработки статических файлов
 	staticDir := "static"
