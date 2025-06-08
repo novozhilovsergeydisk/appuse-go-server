@@ -88,12 +88,12 @@
             {
                 question: "Какой параметр управляет уровнем кеширования статистики в PostgreSQL?",
                 options: ["track_activities", "track_counts", "stats_fetch_consistency", "track_io_timing"],
-                answer: 2
+                answer: 1
             },
             {
                 question: "Какое значение параметра stats_fetch_consistency обеспечивает компромисс между согласованностью и эффективностью?",
-                options: ["none", "cache", "snapshot", "default"],
-                answer: 1
+                options: ["none", "snapshot", "cache", "default"],
+                answer: 2
             },
             {
                 question: "Какой представление показывает статистику обращений к таблицам в терминах строк?",
@@ -101,7 +101,7 @@
                 answer: 0
             },
             {
-                question: "Какой представление показывает статистику обращений к таблицам в терминах страниц?",
+                question: "Какое представление показывает статистику обращений к таблицам в терминах страниц?",
                 options: ["pg_stat_all_tables", "pg_statio_all_tables", "pg_stat_all_indexes", "pg_stat_database"],
                 answer: 1
             },
@@ -172,8 +172,8 @@
             },
             {
                 question: "Какой параметр задает время переключения на следующий файл журнала в минутах?",
-                options: ["log_rotation_age", "log_truncate_on_rotation", "log_filename", "log_rotation_size"],
-                answer: 0
+                options: ["log_truncate_on_rotation", "log_filename", "log_rotation_size", "log_rotation_age"],
+                answer: 3
             },
             {
                 question: "Какой параметр позволяет перезаписывать уже существующие файлы при ротации?",
@@ -183,7 +183,7 @@
             {
                 question: "Какой сторонний инструмент часто используется для анализа журналов PostgreSQL?",
                 options: ["pgBadger", "Munin", "Cacti", "Zabbix"],
-                answer: 3
+                answer: 0
             },
             {
                 question: "Какое расширение PostgreSQL предоставляет статистику по версиям строк?",
