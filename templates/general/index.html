@@ -45,7 +45,7 @@
 
         <div id="quiz-container" class="space-y-8"></div>
 
-        <button onclick="checkAnswers()"
+        <button id="test-result" onclick="checkAnswers()"
             class="mt-8 w-full py-3 bg-primary hover:bg-secondary text-white font-bold rounded-lg transition duration-300">
             Проверить результат
         </button>
@@ -1358,16 +1358,6 @@
                     "max_connections"
                 ],
                 "answer": 0
-            },
-            {
-                "question": "Какой тип репликации обеспечивает минимальную задержку между мастером и репликой?",
-                "options": [
-                    "Асинхронная",
-                    "Логическая",
-                    "Синхронная",
-                    "Каскадная"
-                ],
-                "answer": 2
             },
             {
                 "question": "Какой протокол используется для потоковой передачи WAL-файлов?",
@@ -3897,7 +3887,7 @@
                     "ROW EXCLUSIVE",
                     "ACCESS SHARE"
                 ],
-                "answer": 1
+                "answer": 2
             },
             {
                 "question": "Какой тип блокировки в PostgreSQL конфликтует со всеми другими видами блокировок?",
@@ -5853,18 +5843,26 @@
             }
         ];
 
+        // Функция для получения криптографически безопасного случайного числа
+        function getRandomInt(max) {
+            const randomBuffer = new Uint32Array(1);
+            window.crypto.getRandomValues(randomBuffer);
+            return randomBuffer[0] % (max + 1);
+        }
+
         function createQuiz() {
             const container = document.getElementById('quiz-container');
-
-            // Количество вопросов для отображения (можно изменить)
+            container.innerHTML = '';
+            
+            // Количество вопросов для отображения (по умолчанию 50, но можно изменить)
             const numQuestionsToShow = 50;
-
-            // Создаем копию массива вопросов
+            
+            // Создаем копию массива с вопросами
             const shuffledQuestions = [...quizData];
-
-            // Перемешиваем вопросы случайным образом
+            
+            // Перемешиваем вопросы с помощью алгоритма Фишера-Йетса с использованием криптографически безопасного ГСЧ
             for (let i = shuffledQuestions.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
+                const j = getRandomInt(i);
                 [shuffledQuestions[i], shuffledQuestions[j]] = [shuffledQuestions[j], shuffledQuestions[i]];
             }
 
@@ -5893,20 +5891,38 @@
             });
         }
 
+        function stopTimer() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+        }
+
         function checkAnswers() {
             let correct = 0;
             let hasUnanswered = false;
             const resultDiv = document.getElementById('result');
             const percentage = document.getElementById('percentage');
+            
+            // Останавливаем таймер при проверке ответов
+            stopTimer();
 
             // Получаем выбранные вопросы из глобальной переменной
             const selectedQuestions = window.selectedQuizData || [];
+            const totalQuestions = selectedQuestions.length;
+
+            // Проверяем, что ответили ровно на 50 вопросов
+            if (totalQuestions !== 50) {
+                alert('Тест должен содержать ровно 50 вопросов!');
+                return;
+            }
+
 
             document.querySelectorAll('.answer-label').forEach(label => {
                 label.classList.remove('bg-green-900/20', 'bg-red-900/20', 'border', 'border-success', 'border-danger');
             });
 
-            for (let i = 0; i < selectedQuestions.length; i++) {
+            for (let i = 0; i < totalQuestions; i++) {
                 if (!document.querySelector(`input[name="q${i}"]:checked`)) {
                     hasUnanswered = true;
                     break;
@@ -5917,6 +5933,7 @@
                 alert('Пожалуйста, ответьте на все вопросы!');
                 return;
             }
+
 
             selectedQuestions.forEach((item, index) => {
                 const selected = document.querySelector(`input[name="q${index}"]:checked`);
@@ -5933,8 +5950,24 @@
                 }
             });
 
-            const percent = (correct / selectedQuestions.length) * 100;
-            percentage.textContent = `${percent.toFixed(1)}%`;
+            const percent = (correct / totalQuestions) * 100;
+            percentage.textContent = `${percent.toFixed(1)}% (${correct} из ${totalQuestions})`;
+            
+            // Проверяем, сдан ли тест (минимум 75% правильных ответов)
+            if (percent >= 75) {
+                resultDiv.innerHTML = `
+                    <h2 class="text-2xl font-bold mb-4 text-green-500">Тест сдан!</h2>
+                    <p id="percentage" class="text-4xl text-green-500 font-mono">${percent.toFixed(1)}% (${correct} из ${totalQuestions})</p>
+                    <p class="mt-4 text-green-400">Поздравляем! Вы успешно прошли тест.</p>
+                `;
+            } else {
+                resultDiv.innerHTML = `
+                    <h2 class="text-2xl font-bold mb-4 text-red-500">Тест не сдан</h2>
+                    <p id="percentage" class="text-4xl text-red-500 font-mono">${percent.toFixed(1)}% (${correct} из ${totalQuestions})</p>
+                    <p class="mt-4 text-red-400">Необходимо набрать минимум 75% правильных ответов. Попробуйте еще раз!</p>
+                `;
+            }
+            
             resultDiv.classList.remove('hidden');
             window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
         }
