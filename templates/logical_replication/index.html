@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Логическая репликация</title>
+    <link rel="icon" href="/static/images/favicon.ico" type="image/x-icon">
+
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- <span class="material-icons">home</span> -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#1E40AF',
+                        success: '#10B981',
+                        danger: '#EF4444'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="bg-gray-900 text-white min-h-screen p-8">
+    {{template "navbar.html" .}}
+
+    <div class="max-w-3xl mx-auto">
+        <h1 class="text-2xl md:text-3xl font-bold mb-6 text-center">Логическая репликация</h1>
+
+        <div id="quiz-container" class="space-y-8"></div>
+
+        <button onclick="checkAnswers()"
+            class="mt-8 w-full py-3 bg-primary hover:bg-secondary text-white font-bold rounded-lg transition duration-300">
+            Проверить результат
+        </button>
+
+        <div id="result" class="hidden mt-8 p-6 bg-gray-800 rounded-lg text-center">
+            <h2 class="text-2xl font-bold mb-4">Ваш результат:</h2>
+            <p id="percentage" class="text-4xl text-primary font-mono"></p>
+        </div>
+    </div>
+
+    <script>
+        const quizData = [
+            {
+                question: "Какой тип репликации позволяет передавать изменения в отдельных таблицах между серверами?",
+                options: ["Физическая", "Логическая", "Синхронная", "Асинхронная"],
+                answer: 1
+            },
+            {
+                question: "Что делает публикующий сервер в логической репликации?",
+                options: ["Только читает данные", "Применяет изменения к своим таблицам", "Декодирует журнал и отправляет изменения подписчикам", "Удаляет старые данные"],
+                answer: 2
+            },
+            {
+                question: "Какой сервер получает записи из потока репликации и применяет изменения к своим таблицам?",
+                options: ["Публикующий", "Мастер", "Подписчик", "Резервный"],
+                answer: 2
+            },
+            {
+                question: "Какая особенность характерна для модели публикации-подписки в логической репликации?",
+                options: ["Поток данных возможен только в одну сторону", "Не требуется совместимость протоколов", "Поток данных возможен в обе стороны", "Требуется физическое копирование блоков"],
+                answer: 2
+            },
+            {
+                question: "Какие объекты можно реплицировать при помощи логической репликации?",
+                options: ["Только представления", "Только внешние таблицы", "Обычные таблицы", "Любые объекты БД"],
+                answer: 2
+            },
+            {
+                question: "Какой параметр необходимо изменить на публикующем сервере для включения логической репликации?",
+                options: ["max_connections", "wal_level", "shared_buffers", "work_mem"],
+                answer: 1
+            },
+            {
+                question: "Какой механизм используется для идентификации строк при UPDATE и DELETE в логической репликации?",
+                options: ["Индекс B-tree", "Первичный ключ", "Уникальный индекс", "REPLICA IDENTITY"],
+                answer: 3
+            },
+            {
+                question: "Какой командой создаётся подписка в PostgreSQL?",
+                options: ["CREATE PUBLICATION", "CREATE REPLICATION", "CREATE SUBSCRIPTION", "CREATE LOGICAL"],
+                answer: 2
+            },
+            {
+                question: "Какой командой создаётся публикация в PostgreSQL?",
+                options: ["CREATE SUBSCRIPTION", "CREATE PUBLICATION", "CREATE LOGICAL", "CREATE REPLICATION"],
+                answer: 1
+            },
+            {
+                question: "Какой тип репликации гарантирует транзакционную целостность?",
+                options: ["Физическая", "Логическая", "Асинхронная", "Синхронная"],
+                answer: 1
+            },
+            {
+                question: "Какой процесс на сервере-подписчике получает информацию от публикующего сервера?",
+                options: ["Checkpointer", "Background writer", "Logical replication worker", "WAL sender"],
+                answer: 2
+            },
+            {
+                question: "Какой процесс формирует журнальные записи на публикующем сервере?",
+                options: ["Background writer", "WAL sender", "Autovacuum launcher", "Checkpointer"],
+                answer: 1
+            },
+            {
+                question: "Что происходит при удалении подписки и её повторном создании?",
+                options: ["Данные автоматически синхронизируются", "Информация о синхронизации теряется", "Слот репликации удаляется автоматически", "Репликация продолжается без перерыва"],
+                answer: 1
+            },
+            {
+                question: "Какое ограничение есть у логической репликации при работе с последовательностями?",
+                options: ["Они не поддерживаются", "Значения последовательностей не реплицируются", "Они реплицируются как обычные таблицы", "Они требуют триггеров"],
+                answer: 1
+            },
+            {
+                question: "Какой тип конфликта возникает при нарушении ограничений целостности на подписчике?",
+                options: ["Ошибка подключения", "Конфликт DDL", "Конфликт репликации", "Конфликт WAL"],
+                answer: 2
+            },
+            {
+                question: "Какой метод используется для пропуска конфликтующей транзакции?",
+                options: ["ALTER TABLE", "DROP DATABASE", "ALTER SUBSCRIPTION ... SKIP", "VACUUM FULL"],
+                answer: 2
+            },
+            {
+                question: "Какой уровень wal_level необходим для логической репликации?",
+                options: ["minimal", "archive", "replica", "logical"],
+                answer: 3
+            },
+            {
+                question: "Что такое 'публикация' в контексте логической репликации?",
+                options: ["Снимок данных", "Набор изменений в таблицах", "Процесс декодирования", "Сервер-источник"],
+                answer: 1
+            },
+            {
+                question: "Какой слот репликации создаётся автоматически при создании подписки?",
+                options: ["Физический", "Логический", "Шаблонный", "Временный"],
+                answer: 1
+            },
+            {
+                question: "Какой параметр используется для указания имени слота при создании подписки?",
+                options: ["slot_name", "origin", "connect", "copy_data"],
+                answer: 0
+            },
+            {
+                question: "Какой параметр используется для отключения автоматического создания слота репликации?",
+                options: ["create_slot", "enabled", "connect", "origin"],
+                answer: 0
+            },
+            {
+                question: "Какой параметр позволяет подписчику не копировать начальные данные?",
+                options: ["connect=false", "copy_data=false", "enabled=false", "origin=none"],
+                answer: 1
+            },
+            {
+                question: "Какой тип репликации позволяет использовать разные платформы (например Linux и Windows)?",
+                options: ["Физическая", "Логическая", "Синхронная", "Асинхронная"],
+                answer: 1
+            },
+            {
+                question: "Какой тип репликации может быть организован между разными версиями PostgreSQL?",
+                options: ["Физическая", "Логическая", "Синхронная", "Асинхронная"],
+                answer: 1
+            },
+            {
+                question: "Какой тип репликации позволяет подписчику стать публикующим сервером?",
+                options: ["Физическая", "Логическая", "Синхронная", "Асинхронная"],
+                answer: 1
+            },
+            {
+                question: "Какой параметр используется для включения режима параллельной потоковой передачи?",
+                options: ["streaming", "parallel", "sync", "async"],
+                answer: 0
+            },
+            {
+                question: "Какой тип данных не поддерживается логической репликацией?",
+                options: ["Таблицы", "Последовательности", "Большие объекты", "Секционированные таблицы"],
+                answer: 2
+            },
+            {
+                question: "Какой тип репликации позволяет реплицировать подмножество таблиц?",
+                options: ["Физическая", "Логическая", "Синхронная", "Асинхронная"],
+                answer: 1
+            },
+            {
+                question: "Какой параметр задаёт имя приложения для подписки?",
+                options: ["application_name", "slot_name", "publisher", "subscription"],
+                answer: 0
+            },
+            {
+                question: "Какой тип репликации позволяет объединять несколько баз данных в одну?",
+                options: ["Физическая", "Логическая", "Синхронная", "Асинхронная"],
+                answer: 1
+            },
+            {
+                question: "Какой тип репликации позволяет использовать каскадную схему?",
+                options: ["Физическая", "Логическая", "Синхронная", "Асинхронная"],
+                answer: 1
+            },
+            {
+                question: "Какой тип репликации позволяет выполнять операции TRUNCATE?",
+                options: ["Физическая", "Логическая", "Синхронная", "Асинхронная"],
+                answer: 1
+            },
+            {
+                question: "Какой тип репликации позволяет выполнять выборочную репликацию?",
+                options: ["Физическая", "Логическая", "Синхронная", "Асинхронная"],
+                answer: 1
+            },
+            {
+                question: "Какой тип репликации использует модель публикаций/подписок?",
+                options: ["Физическая", "Логическая", "Синхронная", "Асинхронная"],
+                answer: 1
+            },
+            {
+                question: "Какой тип репликации позволяет подписаться на несколько публикаций?",
+                options: ["Физическая", "Логическая", "Синхронная", "Асинхронная"],
+                answer: 1
+            },
+            {
+                question: "Какой тип репликации позволяет организовать двунаправленный поток данных?",
+                options: ["Физическая", "Логическая", "Синхронная", "Асинхронная"],
+                answer: 1
+            },
+            {
+                question: "Какой тип репликации позволяет реплицировать данные по сети с разных серверов?",
+                options: ["Физическая", "Логическая", "Синхронная", "Асинхронная"],
+                answer: 1
+            },
+            {
+                question: "Какой тип репликации позволяет реплицировать данные в реальном времени?",
+                options: ["Физическая", "Логическая", "Синхронная", "Асинхронная"],
+                answer: 1
+            },
+            {
+                question: "Какой тип репликации позволяет реплицировать данные с фильтрацией строк?",
+                options: ["Физическая", "Логическая", "Синхронная", "Асинхронная"],
+                answer: 1
+            },
+            {
+                question: "Какой тип репликации позволяет реплицировать данные с фильтрацией операций?",
+                options: ["Физическая", "Логическая", "Синхронная", "Асинхронная"],
+                answer: 1
+            },
+            {
+                question: "Какой тип репликации позволяет реплицировать данные между секционированными таблицами?",
+                options: ["Физическая", "Логическая", "Синхронная", "Асинхронная"],
+                answer: 1
+            },
+            {
+                question: "Какой тип репликации позволяет реплицировать данные в таблицы с другим порядком столбцов?",
+                options: ["Физическая", "Логическая", "Синхронная", "Асинхронная"],
+                answer: 1
+            },
+            {
+                question: "Какой тип репликации позволяет реплицировать данные в таблицы с дополнительными столбцами?",
+                options: ["Физическая", "Логическая", "Синхронная", "Асинхронная"],
+                answer: 1
+            },
+            {
+                question: "Какой тип репликации позволяет реплицировать данные в таблицы с преобразованием типов?",
+                options: ["Физическая", "Логическая", "Синхронная", "Асинхронная"],
+                answer: 1
+            },
+            {
+                question: "Какой тип репликации позволяет реплицировать данные в таблицы с разными именами?",
+                options: ["Физическая", "Логическая", "Синхронная", "Асинхронная"],
+                answer: 1
+            },
+            {
+                question: "Какой тип репликации позволяет реплицировать данные в таблицы с разными схемами?",
+                options: ["Физическая", "Логическая", "Синхронная", "Асинхронная"],
+                answer: 1
+            },
+            {
+                question: "Какой тип репликации позволяет реплицировать данные в таблицы с разными структурами?",
+                options: ["Физическая", "Логическая", "Синхронная", "Асинхронная"],
+                answer: 1
+            },
+            {
+                question: "Какой тип репликации позволяет реплицировать данные в таблицы с разными СУБД?",
+                options: ["Физическая", "Логическая", "Синхронная", "Асинхронная"],
+                answer: 1
+            },
+            {
+                question: "Какой тип репликации позволяет реплицировать данные в таблицы с разными версиями PostgreSQL?",
+                options: ["Физическая", "Логическая", "Синхронная", "Асинхронная"],
+                answer: 1
+            }
+        ];
+
+        function createQuiz() {
+            const container = document.getElementById('quiz-container');
+
+            // Количество вопросов для отображения (можно изменить)
+            const numQuestionsToShow = 10;
+
+            // Создаем копию массива вопросов
+            const shuffledQuestions = [...quizData];
+
+            // Перемешиваем вопросы случайным образом
+            for (let i = shuffledQuestions.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffledQuestions[i], shuffledQuestions[j]] = [shuffledQuestions[j], shuffledQuestions[i]];
+            }
+
+            // Выбираем нужное количество вопросов (или все, если их меньше)
+            const selectedQuestions = shuffledQuestions.slice(0, Math.min(numQuestionsToShow, shuffledQuestions.length));
+
+            // Сохраняем выбранные вопросы для проверки ответов
+            window.selectedQuizData = selectedQuestions;
+
+            // Отображаем выбранные вопросы
+            selectedQuestions.forEach((item, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = "bg-gray-800 p-6 rounded-lg";
+                questionDiv.innerHTML = `
+                <h2 class="text-xl font-semibold mb-4">${index + 1}. ${item.question}</h2>
+                <div class="space-y-2">
+                    ${item.options.map((option, i) => `
+                        <label class="flex items-center space-x-3 p-2 rounded-md hover:bg-gray-700 answer-label">
+                            <input type="radio" name="q${index}" value="${i}" class="w-4 h-4 text-primary focus:ring-primary">
+                            <span>${option}</span>
+                        </label>
+                    `).join('')}
+                </div>
+            `;
+                container.appendChild(questionDiv);
+            });
+        }
+
+        function checkAnswers() {
+            let correct = 0;
+            let hasUnanswered = false;
+            const resultDiv = document.getElementById('result');
+            const percentage = document.getElementById('percentage');
+
+            // Получаем выбранные вопросы из глобальной переменной
+            const selectedQuestions = window.selectedQuizData || [];
+
+            document.querySelectorAll('.answer-label').forEach(label => {
+                label.classList.remove('bg-green-900/20', 'bg-red-900/20', 'border', 'border-success', 'border-danger');
+            });
+
+            for (let i = 0; i < selectedQuestions.length; i++) {
+                if (!document.querySelector(`input[name="q${i}"]:checked`)) {
+                    hasUnanswered = true;
+                    break;
+                }
+            }
+
+            if (hasUnanswered) {
+                alert('Пожалуйста, ответьте на все вопросы!');
+                return;
+            }
+
+            selectedQuestions.forEach((item, index) => {
+                const selected = document.querySelector(`input[name="q${index}"]:checked`);
+                if (selected) {
+                    const selectedLabel = selected.closest('.answer-label');
+                    const correctLabel = document.querySelector(`input[name="q${index}"][value="${item.answer}"]`).closest('.answer-label');
+                    if (parseInt(selected.value) === item.answer) {
+                        correctLabel.classList.add('bg-green-900/20', 'border', 'border-success');
+                        correct++;
+                    } else {
+                        selectedLabel.classList.add('bg-red-900/20', 'border', 'border-danger');
+                        correctLabel.classList.add('bg-green-900/20', 'border', 'border-success');
+                    }
+                }
+            });
+
+            const percent = (correct / selectedQuestions.length) * 100;
+            percentage.textContent = `${percent.toFixed(1)}%`;
+            resultDiv.classList.remove('hidden');
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        }
+
+        window.onload = createQuiz;
+    </script>
+
+    {{template "footer.html" .}}
+</body>
+
+</html>
