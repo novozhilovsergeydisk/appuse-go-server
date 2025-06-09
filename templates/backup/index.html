@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Резервное копирование</title>
+    <link rel="icon" href="/static/images/favicon.ico" type="image/x-icon">
+
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- <span class="material-icons">home</span> -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#1E40AF',
+                        success: '#10B981',
+                        danger: '#EF4444'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="bg-gray-900 text-white min-h-screen p-8">
+    {{template "navbar.html" .}}
+
+    <div class="max-w-3xl mx-auto">
+        <h1 class="text-2xl md:text-3xl font-bold mb-6 text-center">Резервное копирование</h1>
+
+        <div id="quiz-container" class="space-y-8"></div>
+
+        <button onclick="checkAnswers()"
+            class="mt-8 w-full py-3 bg-primary hover:bg-secondary text-white font-bold rounded-lg transition duration-300">
+            Проверить результат
+        </button>
+
+        <div id="result" class="hidden mt-8 p-6 bg-gray-800 rounded-lg text-center">
+            <h2 class="text-2xl font-bold mb-4">Ваш результат:</h2>
+            <p id="percentage" class="text-4xl text-primary font-mono"></p>
+        </div>
+    </div>
+
+    <script>
+        const quizData = [
+            {
+                question: "Какой тип резервного копирования позволяет восстановить данные на произвольный момент времени?",
+                options: ["Логическое", "Физическое", "Горячее", "Холодное"],
+                answer: 1
+            },
+            {
+                question: "Какое средство используется для создания логической резервной копии PostgreSQL?",
+                options: ["rsync", "pg_dump", "tar", "pg_basebackup"],
+                answer: 1
+            },
+            {
+                question: "Какой механизм позволяет восстановить базу данных целиком, но не отдельные объекты?",
+                options: ["pg_dump", "pg_dumpall", "Физическое резервное копирование", "COPY"],
+                answer: 2
+            },
+            {
+                question: "Что представляет собой логическая резервная копия?",
+                options: ["Копия файлов кластера", "Набор SQL-команд", "Снимок WAL", "Двоичный дамп"],
+                answer: 1
+            },
+            {
+                question: "Какой недостаток у логического резервного копирования?",
+                options: ["Требует много места", "Медленная скорость", "Не поддерживает восстановление на другой версии", "Требует остановки сервера"],
+                answer: 1
+            },
+            {
+                question: "Какая команда используется для выгрузки глобальных объектов (например, ролей)?",
+                options: ["pg_dump", "pg_restore", "pg_dumpall", "pg_basebackup"],
+                answer: 2
+            },
+            {
+                question: "Что такое физическое резервное копирование?",
+                options: ["Копирование SQL-запросов", "Копирование файлов кластера", "Архивирование журналов WAL", "Создание CSV-дампов"],
+                answer: 1
+            },
+            {
+                question: "Какой недостаток у физического резервного копирования?",
+                options: ["Невозможно восстановить отдельную таблицу", "Медленная скорость", "Требует много места", "Требует остановки сервера"],
+                answer: 0
+            },
+            {
+                question: "Как называется процесс, позволяющий восстановить данные на определенный момент времени?",
+                options: ["Point-in-Time Recovery", "Logical Dump", "Cold Backup", "Snapshot"],
+                answer: 0
+            },
+            {
+                question: "Что нужно сделать после восстановления резервной копии для улучшения производительности?",
+                options: ["Оптимизировать индексы", "Выполнить ANALYZE", "Удалить старые журналы", "Запустить VACUUM"],
+                answer: 1
+            },
+            {
+                question: "Какой параметр в pg_backup_start позволяет начать резервное копирование немедленно?",
+                options: ["true", "false", "immediate", "fast"],
+                answer: 0
+            },
+            {
+                question: "Какой формат можно указать при использовании команды COPY?",
+                options: ["JSON", "XML", "CSV", "YAML"],
+                answer: 2
+            },
+            {
+                question: "Какой файл создаётся при выполнении pg_basebackup и содержит информацию о WAL-файлах?",
+                options: ["WAL-лог", "История резервного копирования", "pg_control", "pg_stat"],
+                answer: 1
+            },
+            {
+                question: "Какой из перечисленных методов позволяет создать обособленную горячую копию?",
+                options: ["pg_dump", "pg_basebackup", "rsync", "tar"],
+                answer: 1
+            },
+            {
+                question: "Что нельзя восстановить с помощью физического резервного копирования?",
+                options: ["Весь кластер", "Отдельную таблицу", "Табличные пространства", "Системные данные"],
+                answer: 1
+            },
+            {
+                question: "Какой уровень совместимости требуется для логического резервного копирования?",
+                options: ["Двоичный", "Протокольный", "SQL-совместимость", "Платформенная"],
+                answer: 2
+            },
+            {
+                question: "Какой режим должен быть включен для корректного создания резервной копии WAL?",
+                options: ["checkpoint_timeout", "full_page_writes", "archive_mode", "logging_collector"],
+                answer: 1
+            },
+            {
+                question: "Какой параметр влияет на длительность ожидания контрольной точки при резервном копировании?",
+                options: ["checkpoint_completion_target", "checkpoint_segments", "checkpoint_timeout", "max_wal_size"],
+                answer: 2
+            },
+            {
+                question: "Какой утилитой нельзя делать копию файлов при физическом резервном копировании?",
+                options: ["tar", "cpio", "pg_dump", "rsync"],
+                answer: 2
+            },
+            {
+                question: "Какой параметр управляет временем принудительного переключения WAL-файлов?",
+                options: ["checkpoint_timeout", "wal_keep_segments", "max_wal_size", "archive_timeout"],
+                answer: 3
+            },
+            {
+                question: "Какой функцией начинается горячее резервное копирование в PostgreSQL?",
+                options: ["pg_backup_stop", "pg_switch_wal", "pg_backup_start", "pg_archive_ready"],
+                answer: 2
+            },
+            {
+                question: "Какой каталог необходимо очистить перед восстановлением резервной копии?",
+                options: ["pg_wal/", "pg_log/", "pg_data/", "pg_tblspc/"],
+                answer: 2
+            },
+            {
+                question: "Какой параметр позволяет включить архивирование WAL-файлов?",
+                options: ["archive_command", "archive_mode", "wal_level", "restore_command"],
+                answer: 1
+            },
+            {
+                question: "Какой файл хранит информацию о состоянии резервного копирования?",
+                options: ["backup_label", "backup_manifest", "pg_control", "pg_replslot"],
+                answer: 0
+            },
+            {
+                question: "Какой режим обеспечивает максимальное количество информации в WAL?",
+                options: ["minimal", "replica", "logical", "full"],
+                answer: 3
+            },
+            {
+                question: "Какой инструмент может использоваться для потокового архивирования WAL?",
+                options: ["pg_receivewal", "pg_restore", "pg_basebackup", "pg_dump"],
+                answer: 0
+            },
+            {
+                question: "Какой параметр задаёт путь к архивным файлам WAL?",
+                options: ["archive_dir", "archive_path", "archive_command", "wal_path"],
+                answer: 2
+            },
+            {
+                question: "Какой слот нужен для предотвращения удаления WAL-файлов?",
+                options: ["Replication slot", "Archive slot", "Backup slot", "Log slot"],
+                answer: 0
+            },
+            {
+                question: "Какой ключ pg_dump позволяет сохранить привилегии объектов?",
+                options: ["--privileges", "--owner", "--acl", "--grant"],
+                answer: 2
+            },
+            {
+                question: "Какой режим позволяет восстановить дамп в одной транзакции?",
+                options: ["--single-transaction", "--atomic", "--one-transaction", "--batch"],
+                answer: 0
+            },
+            {
+                question: "Какой файл содержит историю линий времени?",
+                options: ["history.log", "00000001.history", "timeline.hist", "recovery.conf"],
+                answer: 1
+            },
+            {
+                question: "Какой параметр управляет количеством WAL-файлов для хранения?",
+                options: ["wal_keep_segments", "max_wal_size", "wal_retention", "archive_limit"],
+                answer: 0
+            },
+            {
+                question: "Какой уровень wal_level требуется для логической репликации?",
+                options: ["replica", "logical", "minimal", "full"],
+                answer: 1
+            },
+            {
+                question: "Какой символ используется в COPY для обозначения NULL?",
+                options: ["NULL", "\\N", "null", "empty"],
+                answer: 1
+            },
+            {
+                question: "Какой параметр отвечает за включение full_page_writes?",
+                options: ["full_page", "page_full", "full_page_writes", "write_full_page"],
+                answer: 2
+            },
+            {
+                question: "Какой формат поддерживает параллельное восстановление?",
+                options: ["plain", "customize", "directory (pg_dump --format=directory)", "tar"],
+                answer: 2
+            },
+            {
+                question: "Какой файл используется для управления восстановлением?",
+                options: ["recovery.conf", "postgresql.conf", "restore.conf", "backup.conf"],
+                answer: 0
+            },
+            {
+                question: "Какой параметр определяет порт при восстановлении из копии командой pg_restore?",
+                options: ["port", "listen_addresses", "pgport", "restore_port"],
+                answer: 0
+            },
+            {
+                question: "Какой параметр ограничивает размер WAL между контрольными точками?",
+                options: ["min_wal_size", "max_wal_size", "checkpoint_segments", "wal_segment_size"],
+                answer: 1
+            },
+            {
+                question: "Какой командой можно вручную переключить WAL-сегмент?",
+                options: ["pg_rotate_wal", "pg_switch_wal", "pg_flush_wal", "pg_cycle_wal"],
+                answer: 1
+            },
+            {
+                question: "Какой параметр задаёт имя метки для резервного копирования?",
+                options: ["label", "name", "tag", "identifier"],
+                answer: 0
+            },
+            {
+                question: "Какой файл содержит информацию о структуре резервной копии?",
+                options: ["backup_manifest", "backup_label", "pg_control", "recovery.signal"],
+                answer: 1
+            },
+            {
+                question: "Какой параметр отвечает за использование сжатия в pg_dump?",
+                options: [ "--zlib", "--gzip", "--deflate", "--compress"],
+                answer: 3
+            },
+            {
+                question: "Какой параметр задаёт максимальное число попыток архивации WAL?",
+                options: ["archive_retries", "max_archive_attempts", "wal_retry", "retry_count"],
+                answer: 0
+            },
+            {
+                question: "Какой параметр управляет частотой контрольных точек?",
+                options: ["checkpoint_segments", "checkpoint_timeout", "checkpoint_interval", "checkpoint_frequency"],
+                answer: 1
+            },
+            {
+                question: "Какой параметр используется для восстановления до конкретного момента?",
+                options: ["recovery_target_time", "restore_target", "target_recovery", "point_in_time"],
+                answer: 0
+            },
+            {
+                question: "Какой параметр включает сборку журналирования ошибок скриптов?",
+                options: ["log_errors", "logging_collector", "error_logger", "script_logging"],
+                answer: 1
+            },
+            {
+                question: "Какой параметр определяет максимальный размер файла WAL?",
+                options: ["wal_block_size", "wal_segment_size", "wal_file_size", "max_wal_filesize"],
+                answer: 1
+            },
+            {
+                question: "Какой параметр позволяет использовать внешние средства мониторинга?",
+                options: ["monitoring_tool", "external_monitor", "stats_provider", "custom_script"],
+                answer: 3
+            },
+            {
+                question: "Какой параметр определяет место хранения временных файлов?",
+                options: ["temp_buffers", "temp_directory", "temporary_dir", "work_mem_dir"],
+                answer: 1
+            },
+            {
+                question: "Какой параметр управляет максимальным числом клиентских подключений?",
+                options: ["max_connections", "client_max", "connection_limit", "connect_pool"],
+                answer: 0
+            },
+            {
+                question: "Какой параметр определяет уровень детализации записей в WAL?",
+                options: ["wal_detail", "wal_level", "wal_verbose", "wal_debug"],
+                answer: 1
+            },
+            {
+                question: "Какой параметр позволяет изменять права доступа к файлам перед созданием резервной копии?",
+                options: ["file_permissions", "chmod", "umask", "access_rights"],
+                answer: 2
+            },
+            {
+                question: "Какой параметр управляет интервалом проверки наличия новых WAL-файлов?",
+                options: ["wal_check_interval", "archive_check", "check_interval", "wal_poll_interval"],
+                answer: 3
+            },
+            {
+                question: "Какой параметр задаёт максимальное время ожидания архивации WAL?",
+                options: ["archive_timeout", "wal_wait", "timeout_archive", "wal_archive_timeout"],
+                answer: 0
+            }
+        ];
+
+        function createQuiz() {
+            const container = document.getElementById('quiz-container');
+
+            // Количество вопросов для отображения (можно изменить)
+            const numQuestionsToShow = 10;
+
+            // Создаем копию массива вопросов
+            const shuffledQuestions = [...quizData];
+
+            // Перемешиваем вопросы случайным образом
+            for (let i = shuffledQuestions.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffledQuestions[i], shuffledQuestions[j]] = [shuffledQuestions[j], shuffledQuestions[i]];
+            }
+
+            // Выбираем нужное количество вопросов (или все, если их меньше)
+            const selectedQuestions = shuffledQuestions.slice(0, Math.min(numQuestionsToShow, shuffledQuestions.length));
+
+            // Сохраняем выбранные вопросы для проверки ответов
+            window.selectedQuizData = selectedQuestions;
+
+            // Отображаем выбранные вопросы
+            selectedQuestions.forEach((item, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = "bg-gray-800 p-6 rounded-lg";
+                questionDiv.innerHTML = `
+                <h2 class="text-xl font-semibold mb-4">${index + 1}. ${item.question}</h2>
+                <div class="space-y-2">
+                    ${item.options.map((option, i) => `
+                        <label class="flex items-center space-x-3 p-2 rounded-md hover:bg-gray-700 answer-label">
+                            <input type="radio" name="q${index}" value="${i}" class="w-4 h-4 text-primary focus:ring-primary">
+                            <span>${option}</span>
+                        </label>
+                    `).join('')}
+                </div>
+            `;
+                container.appendChild(questionDiv);
+            });
+        }
+
+        function checkAnswers() {
+            let correct = 0;
+            let hasUnanswered = false;
+            const resultDiv = document.getElementById('result');
+            const percentage = document.getElementById('percentage');
+
+            // Получаем выбранные вопросы из глобальной переменной
+            const selectedQuestions = window.selectedQuizData || [];
+
+            document.querySelectorAll('.answer-label').forEach(label => {
+                label.classList.remove('bg-green-900/20', 'bg-red-900/20', 'border', 'border-success', 'border-danger');
+            });
+
+            for (let i = 0; i < selectedQuestions.length; i++) {
+                if (!document.querySelector(`input[name="q${i}"]:checked`)) {
+                    hasUnanswered = true;
+                    break;
+                }
+            }
+
+            if (hasUnanswered) {
+                alert('Пожалуйста, ответьте на все вопросы!');
+                return;
+            }
+
+            selectedQuestions.forEach((item, index) => {
+                const selected = document.querySelector(`input[name="q${index}"]:checked`);
+                if (selected) {
+                    const selectedLabel = selected.closest('.answer-label');
+                    const correctLabel = document.querySelector(`input[name="q${index}"][value="${item.answer}"]`).closest('.answer-label');
+                    if (parseInt(selected.value) === item.answer) {
+                        correctLabel.classList.add('bg-green-900/20', 'border', 'border-success');
+                        correct++;
+                    } else {
+                        selectedLabel.classList.add('bg-red-900/20', 'border', 'border-danger');
+                        correctLabel.classList.add('bg-green-900/20', 'border', 'border-success');
+                    }
+                }
+            });
+
+            const percent = (correct / selectedQuestions.length) * 100;
+            percentage.textContent = `${percent.toFixed(1)}%`;
+            resultDiv.classList.remove('hidden');
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        }
+
+        window.onload = createQuiz;
+    </script>
+
+    {{template "footer.html" .}}
+</body>
+
+</html>

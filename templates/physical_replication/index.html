@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Физическая репликация</title>
+    <link rel="icon" href="/static/images/favicon.ico" type="image/x-icon">
+
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- <span class="material-icons">home</span> -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#1E40AF',
+                        success: '#10B981',
+                        danger: '#EF4444'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="bg-gray-900 text-white min-h-screen p-8">
+    {{template "navbar.html" .}}
+
+    <div class="max-w-3xl mx-auto">
+        <h1 class="text-2xl md:text-3xl font-bold mb-6 text-center">Физическая репликация</h1>
+
+        <div id="quiz-container" class="space-y-8"></div>
+
+        <button onclick="checkAnswers()"
+            class="mt-8 w-full py-3 bg-primary hover:bg-secondary text-white font-bold rounded-lg transition duration-300">
+            Проверить результат
+        </button>
+
+        <div id="result" class="hidden mt-8 p-6 bg-gray-800 rounded-lg text-center">
+            <h2 class="text-2xl font-bold mb-4">Ваш результат:</h2>
+            <p id="percentage" class="text-4xl text-primary font-mono"></p>
+        </div>
+    </div>
+
+    <script>
+        const quizData = [
+            {
+                question: "Какой уровень репликации используется при физической репликации?",
+                options: ["Уровень строк", "Уровень таблиц", "Уровень страниц и версий строк", "Уровень запросов"],
+                answer: 2
+            },
+            {
+                question: "Что передается от мастера к реплике при физической репликации?",
+                options: ["Текст SQL-запросов", "Файлы журналов транзакций (WAL)", "Данные в виде таблиц", "Сериализованные объекты БД"],
+                answer: 1
+            },
+            {
+                question: "Какие роли участвуют в физической репликации?",
+                options: ["Главный и слейв", "Мастер и реплика", "Сервер и клиент", "Балансировщик и нода"],
+                answer: 1
+            },
+            {
+                question: "Какой режим позволяет применять изменения на реплике с задержкой?",
+                options: ["Горячий резерв", "Тёплый резерв", "Холодный резерв", "Отложенный резерв"],
+                answer: 3
+            },
+            {
+                question: "Какая настройка определяет минимальный уровень журналирования для репликации до версии PostgreSQL 10?",
+                options: ["minimal", "replica", "logical", "full"],
+                answer: 0
+            },
+            {
+                question: "Какой параметр используется для настройки синхронной репликации?",
+                options: ["synchronous_standby_names", "wal_level", "hot_standby", "max_connections"],
+                answer: 0
+            },
+            {
+                question: "Какой тип репликации обеспечивает минимальную задержку между мастером и репликой?",
+                options: ["Асинхронная", "Логическая", "Синхронная", "Каскадная"],
+                answer: 2
+            },
+            {
+                question: "Какой протокол используется для потоковой передачи WAL-файлов?",
+                options: ["TCP/IP", "HTTP", "FTP", "SSH"],
+                answer: 0
+            },
+            {
+                question: "Какой пользователь должен быть создан для подключения реплики к мастеру?",
+                options: ["Пользователь с ролью REPLICATION", "Обычный пользователь", "DBA", "Пользователь с SUPERUSER"],
+                answer: 0
+            },
+            {
+                question: "Какой механизм позволяет защищать данные от удаления при VACUUM на мастере?",
+                options: ["Hot Standby Feedback", "Logical Replication", "Streaming Replication", "WAL Archiving"],
+                answer: 0
+            },
+            {
+                question: "Какое представление показывает статус активных реплик?",
+                options: ["pg_stat_replication", "pg_replication_slots", "pg_wal_receiver_status", "pg_database"],
+                answer: 0
+            },
+            {
+                question: "Какой тип репликации может работать через архив WAL-файлов?",
+                options: ["Потоковая", "Файловая", "Логическая", "Синхронная"],
+                answer: 1
+            },
+            {
+                question: "Какой уровень wal_level необходим для логической репликации?",
+                options: ["minimal", "replica", "logical", "full"],
+                answer: 2
+            },
+            {
+                question: "Какой параметр указывает максимальное количество отправителей WAL-данных?",
+                options: ["max_wal_senders", "max_connections", "work_mem", "shared_buffers"],
+                answer: 0
+            },
+            {
+                question: "Какой командой можно перевести реплику в режим мастера?",
+                options: ["pg_promote", "pg_ctl", "pg_basebackup", "pg_rewind"],
+                answer: 0
+            },
+            {
+                question: "Какой тип репликации позволяет использовать несколько уровней реплик?",
+                options: ["Каскадная", "Синхронная", "Логическая", "Асинхронная"],
+                answer: 0
+            },
+            {
+                question: "Какой инструмент используется для создания базовой резервной копии при репликации?",
+                options: ["pg_dump", "pg_basebackup", "pg_restore", "pg_recvlogical"],
+                answer: 1
+            },
+            {
+                question: "Какой метод репликации наиболее уязвим к потере данных при отказе сервера?",
+                options: ["Асинхронная", "Синхронная", "Кворумная", "Каскадная"],
+                answer: 0
+            },
+            {
+                question: "Какой параметр управляет временем ожидания конфликтующих изменений на реплике?",
+                options: ["max_standby_streaming_delay", "statement_timeout", "idle_in_transaction_session_timeout", "checkpoint_segments"],
+                answer: 0
+            },
+            {
+                question: "Какой вид репликации не позволяет выполнять операции записи на реплике?",
+                options: ["Логическая", "Физическая", "С несколькими ведущими", "SQL-репликация"],
+                answer: 1
+            },
+            {
+                question: "Какой уровень wal_level установлен по умолчанию в PostgreSQL 10+?",
+                options: ["minimal", "replica", "logical", "full"],
+                answer: 1
+            },
+            {
+                question: "Какой параметр используется для настройки имени слота репликации на реплике?",
+                options: ["primary_slot_name", "slot_name", "replication_slot", "standby_slot"],
+                answer: 0
+            },
+            {
+                question: "Какое представление используется для просмотра информации о слотах репликации?",
+                options: ["pg_replication_slots", "pg_stat_replication", "pg_wal_receiver_status", "pg_settings"],
+                answer: 0
+            },
+            {
+                question: "Какой тип репликации требует двоичной совместимости между серверами?",
+                options: ["Логическая", "Физическая", "SQL", "Триггерная"],
+                answer: 1
+            },
+            {
+                question: "Какой параметр запрещает автоматическое переключение на реплику при падении мастера?",
+                options: ["failover_mode", "application_name", "trigger_file", "recovery_target"],
+                answer: 2
+            },
+            {
+                question: "Какой тип репликации лучше всего подходит для чтения с высокой нагрузкой?",
+                options: ["Синхронная", "Асинхронная", "Кворумная", "С несколькими ведущими"],
+                answer: 1
+            },
+            {
+                question: "Какой параметр определяет время задержки применения WAL на реплике?",
+                options: ["apply_delay", "max_standby_streaming_delay", "wal_sender_timeout", "archive_timeout"],
+                answer: 1
+            },
+            {
+                question: "Какой тип репликации гарантирует согласованность данных между всеми узлами?",
+                options: ["Асинхронная", "Синхронная", "Логическая", "Файловая"],
+                answer: 1
+            },
+            {
+                question: "Какой процесс отправляет WAL-записи на реплику?",
+                options: ["walwriter", "walsender", "bgwriter", "archiver"],
+                answer: 1
+            },
+            {
+                question: "Какой процесс принимает WAL-записи на реплике?",
+                options: ["walreceiver", "walsender", "startup", "checkpointer"],
+                answer: 0
+            },
+            {
+                question: "Какой файл содержит информацию о текущем состоянии восстановления на реплике?",
+                options: ["recovery.conf", "postgresql.conf", "pg_hba.conf", "postmaster.opts"],
+                answer: 0
+            },
+            {
+                question: "Какой параметр отключает возможность подключения к реплике?",
+                options: ["hot_standby", "read_only", "standby_mode", "archive_mode"],
+                answer: 0
+            },
+            {
+                question: "Какой механизм позволяет избежать конфликта очистки и репликации?",
+                options: ["VACUUM", "Hot Standby Feedback", "WAL Archiving", "Checkpointing"],
+                answer: 1
+            },
+            {
+                question: "Какой тип репликации использует кворум для выбора подтверждения?",
+                options: ["ANY", "ALL", "QUORUM", "FIRST"],
+                answer: 0
+            },
+            {
+                question: "Какой параметр используется для задания списка синхронных резервных серверов?",
+                options: ["synchronous_standby_names", "synchronous_commit", "wal_level", "hot_standby"],
+                answer: 0
+            },
+            {
+                question: "Какой уровень wal_level требуется для горячего резерва?",
+                options: ["minimal", "replica", "logical", "full"],
+                answer: 1
+            },
+            {
+                question: "Какой тип репликации позволяет выполнять чтение с нескольких серверов без потерь согласованности?",
+                options: ["Асинхронная", "Синхронная", "Каскадная", "Файловая"],
+                answer: 1
+            },
+            {
+                question: "Какой процесс отвечает за применение WAL-записей на реплике?",
+                options: ["startup", "walreceiver", "walsender", "bgwriter"],
+                answer: 0
+            },
+            {
+                question: "Какой параметр определяет поведение при сбое синхронной реплики?",
+                options: ["synchronous_commit", "synchronous_standby_names", "commit_delay", "fsync"],
+                answer: 0
+            },
+            {
+                question: "Какой тип репликации лучше подходит для географически распределённых систем?",
+                options: ["Синхронная", "Асинхронная", "Кворумная", "С несколькими ведущими"],
+                answer: 1
+            },
+            {
+                question: "Какой тип репликации предполагает наличие одного ведущего и нескольких ведомых серверов?",
+                options: ["С несколькими ведущими", "С одним ведущим", "Кворумная", "Каскадная"],
+                answer: 1
+            },
+            {
+                question: "Какой тип репликации может вызывать блокировки при интенсивной записи?",
+                options: ["Асинхронная", "Синхронная", "Файловая", "Логическая"],
+                answer: 1
+            },
+            {
+                question: "Какой механизм позволяет защитить версии строк от удаления на мастере?",
+                options: ["Slony-I", "Hot Standby Feedback", "Bucardo", "Pgpool-II"],
+                answer: 1
+            },
+            {
+                question: "Какой тип репликации позволяет читать данные с реплики?",
+                options: ["Физическая", "Логическая", "SQL", "Триггерная"],
+                answer: 0
+            },
+            {
+                question: "Какой параметр регулирует максимальное количество одновременных соединений репликации?",
+                options: ["max_connections", "max_wal_senders", "max_locks_per_transaction", "max_worker_processes"],
+                answer: 1
+            },
+            {
+                question: "Какой уровень wal_level необходим для логической репликации?",
+                options: ["minimal", "replica", "logical", "full"],
+                answer: 2
+            },
+            {
+                question: "Какой тип репликации позволяет создавать резервные копии с реплики?",
+                options: ["Физическая", "Логическая", "SQL", "Триггерная"],
+                answer: 0
+            },
+            {
+                question: "Какой тип репликации более безопасен с точки зрения потери данных?",
+                options: ["Асинхронная", "Синхронная", "Файловая", "Логическая"],
+                answer: 1
+            },
+            {
+                question: "Какой тип репликации позволяет обрабатывать аналитические запросы на реплике?",
+                options: ["Физическая", "Логическая", "SQL", "Триггерная"],
+                answer: 0
+            },
+            {
+                question: "Какой тип репликации позволяет использовать разные версии PostgreSQL на мастере и реплике?",
+                options: ["Физическая", "Логическая", "SQL", "Триггерная"],
+                answer: 1
+            }
+        ];
+
+        function createQuiz() {
+            const container = document.getElementById('quiz-container');
+
+            // Количество вопросов для отображения (можно изменить)
+            const numQuestionsToShow = 10;
+
+            // Создаем копию массива вопросов
+            const shuffledQuestions = [...quizData];
+
+            // Перемешиваем вопросы случайным образом
+            for (let i = shuffledQuestions.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffledQuestions[i], shuffledQuestions[j]] = [shuffledQuestions[j], shuffledQuestions[i]];
+            }
+
+            // Выбираем нужное количество вопросов (или все, если их меньше)
+            const selectedQuestions = shuffledQuestions.slice(0, Math.min(numQuestionsToShow, shuffledQuestions.length));
+
+            // Сохраняем выбранные вопросы для проверки ответов
+            window.selectedQuizData = selectedQuestions;
+
+            // Отображаем выбранные вопросы
+            selectedQuestions.forEach((item, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = "bg-gray-800 p-6 rounded-lg";
+                questionDiv.innerHTML = `
+                <h2 class="text-xl font-semibold mb-4">${index + 1}. ${item.question}</h2>
+                <div class="space-y-2">
+                    ${item.options.map((option, i) => `
+                        <label class="flex items-center space-x-3 p-2 rounded-md hover:bg-gray-700 answer-label">
+                            <input type="radio" name="q${index}" value="${i}" class="w-4 h-4 text-primary focus:ring-primary">
+                            <span>${option}</span>
+                        </label>
+                    `).join('')}
+                </div>
+            `;
+                container.appendChild(questionDiv);
+            });
+        }
+
+        function checkAnswers() {
+            let correct = 0;
+            let hasUnanswered = false;
+            const resultDiv = document.getElementById('result');
+            const percentage = document.getElementById('percentage');
+
+            // Получаем выбранные вопросы из глобальной переменной
+            const selectedQuestions = window.selectedQuizData || [];
+
+            document.querySelectorAll('.answer-label').forEach(label => {
+                label.classList.remove('bg-green-900/20', 'bg-red-900/20', 'border', 'border-success', 'border-danger');
+            });
+
+            for (let i = 0; i < selectedQuestions.length; i++) {
+                if (!document.querySelector(`input[name="q${i}"]:checked`)) {
+                    hasUnanswered = true;
+                    break;
+                }
+            }
+
+            if (hasUnanswered) {
+                alert('Пожалуйста, ответьте на все вопросы!');
+                return;
+            }
+
+            selectedQuestions.forEach((item, index) => {
+                const selected = document.querySelector(`input[name="q${index}"]:checked`);
+                if (selected) {
+                    const selectedLabel = selected.closest('.answer-label');
+                    const correctLabel = document.querySelector(`input[name="q${index}"][value="${item.answer}"]`).closest('.answer-label');
+                    if (parseInt(selected.value) === item.answer) {
+                        correctLabel.classList.add('bg-green-900/20', 'border', 'border-success');
+                        correct++;
+                    } else {
+                        selectedLabel.classList.add('bg-red-900/20', 'border', 'border-danger');
+                        correctLabel.classList.add('bg-green-900/20', 'border', 'border-success');
+                    }
+                }
+            });
+
+            const percent = (correct / selectedQuestions.length) * 100;
+            percentage.textContent = `${percent.toFixed(1)}%`;
+            resultDiv.classList.remove('hidden');
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        }
+
+        window.onload = createQuiz;
+    </script>
+
+    {{template "footer.html" .}}
+</body>
+
+</html>

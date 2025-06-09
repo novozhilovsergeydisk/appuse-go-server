@@ -26,6 +26,8 @@ func main() {
 	mux.HandleFunc("/low_level", handlers.LowLevel)
 	mux.HandleFunc("/monitoring", handlers.Monitoring)
 	mux.HandleFunc("/access_control", handlers.AccessControl)
+	mux.HandleFunc("/backup", handlers.Backup)
+	mux.HandleFunc("/physical_replication", handlers.PhysicalReplication)
 
 	// Настройка обработки статических файлов
 	staticDir := "static"
